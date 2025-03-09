@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: inter, Arial, Helvetica, sans-serif;
+}
+
+.react-datepicker__input-container input {
+  color: white !important;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid rgb(130, 130, 130); /* Sesuaikan warna border */
+}
+
+th, td {
+  border: 1px solid rgb(135, 135, 135); /* Warna border */
+  padding: 5px; /* Atur padding sesuai kebutuhan */
+  text-align: center;
+}
+
+
