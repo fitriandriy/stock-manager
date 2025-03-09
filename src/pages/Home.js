@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { create, getData, getSuppliers, moveStock, deleteStock } from '../api'
+import { create, getData, getSuppliers, getCustomers, moveStock, deleteStock } from '../api'
 import { jwtDecode } from "jwt-decode";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -20,6 +20,7 @@ const Home = () => {
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [deleteSuccess, setDeleteSuccess] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
+  const [openStockPurchase, setOpenStockPurchase] = React.useState(false);
   const style = {
     position: 'absolute',
     top: '50%',
@@ -32,6 +33,7 @@ const Home = () => {
   const [destinationWarehouse, setDestinationWarehouse] = React.useState(1);
   const [stocks, setStocks] = React.useState([])
   const [suppliers, setSuppliers] = React.useState([])
+  const [customers, setCustomers] = React.useState([])
   const [error, setError] = React.useState("")
   const [dataId, setDataId] = React.useState()
   const token = localStorage.getItem("token")
@@ -49,6 +51,7 @@ const Home = () => {
   }
 
   const [supplierId, setSupplierId] = useState(1)
+  const [customerId, setCustomerId] = useState(1)
   const [materialType, setMaterialType] = useState(1)
   const [amount, setAmount] = useState(0)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, rowIndex: null });
@@ -60,6 +63,8 @@ const Home = () => {
 
   const handleOpenAddStock = () => {
     setOpenAddStock(true);
+    setSupplierId(1);
+    setMaterialType(1);
   };
 
   const handleOpenDeleteStock = () => {
@@ -73,14 +78,24 @@ const Home = () => {
     setOpenSuccess(false);
     setDeleteSuccess(false)
     setOpenDelete(false);
+    setOpenStockPurchase(false);
   };
 
   const handleOpenReduceStock = () => {
     setOpenReduceStock(true);
+    setMaterialType(1);
+  };
+
+  const handleOpenStockPurchase = () => {
+    setOpenStockPurchase(true);
+    setCustomerId(1);
+    setMaterialType(1);
   };
 
   const handleOpenTransferStock = () => {
     setOpenTransferStock(true);
+    setDestinationWarehouse(1);
+    setMaterialType(1);
   };
 
   const handleAddStock = async () => {
@@ -90,7 +105,27 @@ const Home = () => {
     }
 
     try {
-      const response = await create(warehouse, supplierId, materialType, amount, 1, editorId, date);
+      const response = await create(warehouse, supplierId, null, materialType, amount, 1, editorId, date);
+
+      if(response.data.status === true) {
+        const newData = await getData(warehouse, date)
+        setStocks(newData.data.data)
+        handleClose();
+        setOpenSuccess(true);
+      }
+    } catch (error) {
+      alert("Error saat membuat stok:", error);
+    }
+  }
+
+  const handleAddStockPurchase = async () => {
+    if (!customerId || !materialType || !amount) {
+      alert("Semua field harus diisi!");
+      return;
+    }
+
+    try {
+      const response = await create(warehouse, null, customerId, materialType, amount, 4, editorId, date);
 
       if(response.data.status === true) {
         const newData = await getData(warehouse, date)
@@ -110,7 +145,7 @@ const Home = () => {
     }
 
     try {
-      const response = await create(warehouse, 0, materialType, amount, 2, editorId, date);
+      const response = await create(warehouse, 0, null, materialType, amount, 2, editorId, date);
 
       if(response.data.status === true) {
         const newData = await getData(warehouse, date)
@@ -179,8 +214,10 @@ const Home = () => {
       try {
         const stock = await getData(warehouse, date)
         const supplier = await getSuppliers()
+        const customer = await getCustomers()
         setStocks(stock.data.data); 
         setSuppliers(supplier.data.data); 
+        setCustomers(customer.data.data);
       } catch (err) {
         setError(err.message); 
       }
@@ -226,7 +263,11 @@ const Home = () => {
         <button
           onClick={handleOpenReduceStock}
           className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
-        >+ STOK KELUAR</button>
+        >+ GILING</button>
+        <button
+          onClick={handleOpenStockPurchase}
+          className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
+        >+ PENJUALAN</button>
         <button
           onClick={handleOpenTransferStock}
           className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
@@ -267,7 +308,10 @@ const Home = () => {
               <label>Supplier:</label>
               <select
                 className='border p-[2px] w-[150px] rounded-md' name="suppliers" id="suppliers"
-                onChange={(e) => setSupplierId(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setSupplierId(value)
+                }}
               >
                 {
                   suppliers.slice(1).map((data) => (
@@ -280,7 +324,10 @@ const Home = () => {
               <label>Jenis Beras:</label>
               <select
                 className='border p-[2px] w-[150px] rounded-md' name='material_type' id='materials'
-                onChange={(e) => setMaterialType(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setMaterialType(value);
+                }}
               >
                 <option key={1} value={1}>IR64 A</option>
                 <option key={2} value={2}>IR64 B</option>
@@ -303,6 +350,63 @@ const Home = () => {
         </Box>
       </Modal>
 
+      {/* ADD PURCHASE */}
+      <Modal
+        open={openStockPurchase}
+        onClose={handleClose}
+        aria-labelledby="child-modal-title"
+        aria-describedby="child-modal-description"
+      >
+        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+          <h2 className='font-semibold text-center pb-3'>TAMBAH DATA PENJUALAN</h2>
+          <div className='flex gap-2'>
+            <div className='text-left'>
+              <label>Customer:</label>
+              <select
+                className='border p-[2px] w-[150px] rounded-md' name="customers" id="customers"
+                onChange={(e) => {
+                  const value = e.target.value
+                  setCustomerId(value)
+                  console.log(value)
+                }}
+              >
+                {
+                  customers.map((data) => (
+                    <option key={data.id} value={data.id}>{data.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+            <div className='text-left'>
+              <label>Jenis Beras:</label>
+              <select
+                className='border p-[2px] w-[150px] rounded-md' name='material_type' id='materials'
+                onChange={(e) => {
+                  const value = e.target.value
+                  setMaterialType(value)
+                }}
+              >
+                <option key={1} value={1}>IR64 A</option>
+                <option key={2} value={2}>IR64 B</option>
+                <option key={3} value={3}>IR64 C</option>
+                <option key={4} value={4}>Bramo</option>
+              </select>
+            </div>
+            <div className='text-left'>
+              <label>Jumlah:</label>
+              <input
+                className='border w-[150px] rounded-md'
+                onChange={(e) => setAmount(e.target.value)}
+              ></input>
+            </div>
+          </div>
+          <button
+            className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
+            onClick={handleAddStockPurchase}
+          >TAMBAH</button>
+        </Box>
+      </Modal>
+
       {/* PINDAH GUDANG */}
       <Modal
         open={openTransfer}
@@ -315,7 +419,13 @@ const Home = () => {
           <div className='flex gap-4'>
             <div className='text-left w-[50%]'>
               <label>Tujuan:</label>
-              <select onChange={(e) => setDestinationWarehouse(e.target.value)} className='border p-[2px] w-full rounded-md' name="cars" id="cars">
+              <select 
+                onChange={(e) => {
+                  const value = e.target.value
+                  setDestinationWarehouse(value)
+                }}
+                className='border p-[2px] w-full rounded-md' 
+                name="cars" id="cars">
                 <option value={1}>GD 1</option>
                 <option value={2}>GD 2</option>
                 <option value={3}>GD 3</option>
@@ -328,7 +438,10 @@ const Home = () => {
               <label>Jenis Beras:</label>
               <select
                 className='border p-[2px] w-full rounded-md' name='material_type' id='materials'
-                onChange={(e) => setMaterialType(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setMaterialType(value)
+                }}
               >
                 <option key={1} value={1}>IR64 A</option>
                 <option key={2} value={2}>IR64 B</option>
@@ -340,7 +453,10 @@ const Home = () => {
               <label>Jumlah:</label>
               <input
                 className='border w-full rounded-md'
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setAmount(value)
+                }}
               ></input>
             </div>
           </div>
@@ -365,7 +481,10 @@ const Home = () => {
               <label>Jenis Beras:</label>
               <select
                 className='border p-[2px] w-full rounded-md' name='material_type' id='materials'
-                onChange={(e) => setMaterialType(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setMaterialType(value)
+                }}
               >
                 <option key={1} value={1}>IR64 A</option>
                 <option key={2} value={2}>IR64 B</option>
@@ -377,7 +496,10 @@ const Home = () => {
               <label>Jumlah:</label>
               <input
                 className='border w-full rounded-md'
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setAmount(value)
+                }}
               ></input>
             </div>
           </div>
@@ -408,6 +530,7 @@ const Home = () => {
         </Box>
       </Modal>
 
+      {/* BUTTON GROUP */}
       <div className='border border-[#f4f4f4] flex gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
         <ToggleButtonGroup
           color="primary"
@@ -514,17 +637,21 @@ const Home = () => {
                   <td>{idx + 1}</td>
                   <td 
                     className={
-                      row.transaction_type === 'keluar' 
+                      row.transaction_type === 'giling' 
                         ? 'text-[white] bg-[red] text-left w-[150px]' 
                         : row.transaction_type === 'pindah'
                         ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
+                        : row.transaction_type === 'jual'
+                        ? 'text-[#000000] bg-[#52ff0d] text-left w-[150px]'
                         : 'text-left w-[150px]'
                     }>
                     {
-                      row.transaction_type === 'keluar' 
-                        ? 'KELUAR' 
+                      row.transaction_type === 'giling' 
+                        ? 'GILING' 
                         : row.transaction_type === 'pindah' 
                         ? row.description.toUpperCase()
+                        : row.transaction_type === 'jual' 
+                        ? row.customer.toUpperCase()
                         : row.supplier === 'Others' 
                         ? row.description.toUpperCase()
                         : row.supplier.toUpperCase()
@@ -534,10 +661,10 @@ const Home = () => {
                   <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
                   <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
                   <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'A' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
-                  <td>{ row.material === 'B' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
-                  <td>{ row.material === 'C' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
-                  <td>{ row.material === 'Bramo' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
+                  <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                  <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                  <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                  <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
                   <td>{row.totalA}</td>
                   <td>{row.totalB}</td>
                   <td>{row.totalC}</td>
@@ -552,17 +679,21 @@ const Home = () => {
                   <td>{idx + 1}</td>
                   <td 
                     className={
-                      row.transaction_type === 'keluar' 
+                      row.transaction_type === 'giling' 
                         ? 'text-[white] bg-[red] text-left w-[150px]' 
                         : row.transaction_type === 'pindah'
                         ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
+                        : row.transaction_type === 'jual'
+                        ? 'text-[#000000] bg-[#66ff0d] text-left w-[150px]'
                         : 'text-left w-[150px]'
                     }>
                     {
-                      row.transaction_type === 'keluar' 
-                        ? 'KELUAR' 
+                      row.transaction_type === 'giling' 
+                        ? 'GILING' 
                         : row.transaction_type === 'pindah' 
                         ? row.description.toUpperCase()
+                        : row.transaction_type === 'jual' 
+                        ? row.customer.toUpperCase()
                         : row.supplier === 'Others' 
                         ? row.description.toUpperCase()
                         : row.supplier.toUpperCase()
@@ -572,10 +703,10 @@ const Home = () => {
                   <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
                   <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
                   <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'A' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
-                  <td>{ row.material === 'B' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
-                  <td>{ row.material === 'C' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
-                  <td>{ row.material === 'Bramo' && (row.transaction_type === 'keluar' || row.transaction_type === 'pindah') ? row.amount : '' }</td>
+                  <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                  <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                  <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                  <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
                   <td>{row.totalA}</td>
                   <td>{row.totalB}</td>
                   <td>{row.totalC}</td>
