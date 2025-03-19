@@ -97,3 +97,16 @@ export const deleteStock = async (id) => {
     alert(error)
   }
 }
+
+export const getReports = async (date) => {
+  try {
+    const response = await axios.get(`http://localhost:8000/stocks/${date}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response
+  } catch (error) {
+    alert(error)
+  }
+}
