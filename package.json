@@ -30,7 +30,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "electron": "electron .",
-    "electron-dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && npm run electron\""
+    "electron-dev": "concurrently \"npm start\" \"wait-on http://localhost:4000 && npm run electron\""
   },
   "eslintConfig": {
     "extends": [

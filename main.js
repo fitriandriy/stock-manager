@@ -13,7 +13,7 @@ app.on('ready', () => {
   });
 
   // Muat React Dev Server
-  const startURL = 'http://localhost:3000';
+  const startURL = 'http://localhost:4000';
   mainWindow.loadURL(startURL);
 
   // Buka DevTools (opsional untuk debugging)

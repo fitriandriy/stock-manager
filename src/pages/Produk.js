@@ -7,11 +7,11 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { create, getData, getSuppliers, getCustomers, moveStock, deleteStock } from '../api'
+import { addReduceStock, getStockProducts, getProducts, addStockProduct, deleteStockProduct, addPurchase, moveStockProduct, getProductReports } from '../api'
 import { jwtDecode } from "jwt-decode";
 import "react-datepicker/dist/react-datepicker.css";
 
-const Home = () => {
+const Produk = () => {
   const [startDate, setStartDate] = useState(new Date());
   const date = startDate.toLocaleDateString('en-CA')
   const [openAddStock, setOpenAddStock] = React.useState(false);
@@ -32,9 +32,8 @@ const Home = () => {
   const [warehouse, setWarehouse] = React.useState(1);
   const [destinationWarehouse, setDestinationWarehouse] = React.useState(1);
   const [stocks, setStocks] = React.useState([])
-  const [suppliers, setSuppliers] = React.useState([])
-  const [customers, setCustomers] = React.useState([])
-  const [error, setError] = React.useState("")
+  const [products, setProducts] = React.useState([])
+  const [productReports, setProductReports] = React.useState([])
   const [dataId, setDataId] = React.useState()
   const token = localStorage.getItem("token")
   let editorId = null;
@@ -50,11 +49,9 @@ const Home = () => {
     }
   }
 
-  const [supplierId, setSupplierId] = useState(1)
-  const [customerId, setCustomerId] = useState(1)
-  const [materialType, setMaterialType] = useState(1)
+  const [productName, setProductName] = useState(3)
   const [amount, setAmount] = useState(0)
-  const [plateNumber, setPlateNumber] = useState()
+  const [description, setDescription] = useState('')
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, rowIndex: null });
   const [activeRow, setActiveRow] = useState(null);
 
@@ -64,8 +61,7 @@ const Home = () => {
 
   const handleOpenAddStock = () => {
     setOpenAddStock(true);
-    setSupplierId(1);
-    setMaterialType(1);
+    setProductName(3);
   };
 
   const handleOpenDeleteStock = () => {
@@ -84,32 +80,30 @@ const Home = () => {
 
   const handleOpenReduceStock = () => {
     setOpenReduceStock(true);
-    setMaterialType(1);
   };
 
   const handleOpenStockPurchase = () => {
     setOpenStockPurchase(true);
-    setCustomerId(1);
-    setMaterialType(1);
+    setProductName(3);
   };
 
   const handleOpenTransferStock = () => {
     setOpenTransferStock(true);
     setDestinationWarehouse(1);
-    setMaterialType(1);
+    setProductName(3);
   };
 
   const handleAddStock = async () => {
-    if (!supplierId || !materialType || !amount) {
+    if (!productName || !amount) {
       alert("Semua field harus diisi!");
       return;
     }
 
     try {
-      const response = await create(warehouse, supplierId, null, materialType, amount, plateNumber, 1, editorId, date);
+      const response = await addStockProduct(warehouse, productName, amount, description, editorId, date);
 
       if(response.data.status === true) {
-        const newData = await getData(warehouse, date)
+        const newData = await getStockProducts(warehouse, date)
         setStocks(newData.data.data)
         handleClose();
         setOpenSuccess(true);
@@ -120,16 +114,16 @@ const Home = () => {
   }
 
   const handleAddStockPurchase = async () => {
-    if (!customerId || !materialType || !amount) {
+    if (!productName || !amount) {
       alert("Semua field harus diisi!");
       return;
     }
 
     try {
-      const response = await create(warehouse, null, customerId, materialType, amount, "", 4, editorId, date);
+      const response = await addPurchase(warehouse, productName, amount, description, editorId, date);
 
       if(response.data.status === true) {
-        const newData = await getData(warehouse, date)
+        const newData = await getStockProducts(warehouse, date)
         setStocks(newData.data.data)
         handleClose();
         setOpenSuccess(true);
@@ -139,17 +133,18 @@ const Home = () => {
     }
   }
 
+  // tambah stok untuk digiling
   const handleReduceStock = async () => {
-    if ( !materialType || !amount) {
+    if ( !productName || !amount) {
       alert("Semua field harus diisi!");
       return;
     }
 
     try {
-      const response = await create(warehouse, 0, null, materialType, amount, "", 2, editorId, date);
+      const response = await addReduceStock(warehouse, productName, amount, description, editorId, date);
 
       if(response.data.status === true) {
-        const newData = await getData(warehouse, date)
+        const newData = await getStockProducts(warehouse, date)
         setStocks(newData.data.data)
         handleClose();
         setOpenSuccess(true);
@@ -160,16 +155,16 @@ const Home = () => {
   }
 
   const handleMoveStock = async () => {
-    if (!destinationWarehouse || !materialType || !amount) {
+    if (!destinationWarehouse || !productName || !amount) {
       alert("Semua field harus diisi!");
       return;
     }
 
     try {
-      const response = await moveStock(warehouse, destinationWarehouse, materialType, amount, editorId, date);
+      const response = await moveStockProduct(warehouse, destinationWarehouse, productName, amount, editorId, date);
 
       if(response.data.status === true) {
-        const newData = await getData(warehouse, date)
+        const newData = await getStockProducts(warehouse, date)
         setStocks(newData.data.data)
         handleClose();
         setOpenSuccess(true);
@@ -197,9 +192,9 @@ const Home = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await deleteStock(id)
+      const response = await deleteStockProduct(id)
       if(response.data.status === true) {
-        const newData = await getData(warehouse, date)
+        const newData = await getStockProducts(warehouse, date)
         setStocks(newData.data.data)
         handleClose();
         setDeleteSuccess(true);
@@ -213,36 +208,25 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const stock = await getData(warehouse, date)
-        const supplier = await getSuppliers()
-        const customer = await getCustomers()
+        if (!warehouse || !startDate) return;
+  
+        const stock = await getStockProducts(warehouse, startDate);
         setStocks(stock.data.data); 
-        setSuppliers(supplier.data.data); 
-        setCustomers(customer.data.data);
+  
+        const product = await getProducts();
+        setProducts(product.data.data); 
+  
+        const productReport = await getProductReports(warehouse, startDate);
+        setProductReports(productReport.data.data); 
+  
       } catch (err) {
-        setError(err.message); 
+        alert(err.message);
       }
     };
-
+  
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getData(warehouse, date)
-        setStocks(response.data.data)
-      } catch (err) {
-        setError(err.message);
-        alert(error)
-      }
-    };
-
-    if (startDate && warehouse) {
-      fetchData();
-    }
-  }, [startDate, warehouse]);
-
+  }, [warehouse, startDate]);
+  
   return (
     <div onClick={handleClickOutside} className='text-[#585858]'>
       <NavBar />
@@ -260,7 +244,7 @@ const Home = () => {
         <button
           onClick={handleOpenAddStock}
           className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
-        >+ STOK MASUK</button>
+        >+ HASIL GILING</button>
         <button
           onClick={handleOpenReduceStock}
           className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
@@ -302,59 +286,49 @@ const Home = () => {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box className="text-center border rounded-lg p-5 px-10" sx={{ ...style }}>
-          <h2 className='font-semibold text-center pb-3'>TAMBAH STOK MASUK</h2>
+        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+          <h2 className='font-semibold text-center pb-3'>TAMBAH HASIL GILING</h2>
           <div className='grid grid-cols-1 gap-3'>
-            <div className='grid grid-cols-7 items-center'>
-              <label className='col-span-2 text-left'>Supplier</label>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Jenis Produk</label>
               <p className='col-span-1'>:</p>
               <select
-                className='col-span-4 border p-[2px] w-[150px] rounded-md' name="suppliers" id="suppliers"
-                onChange={(e) => {
-                  const value = e.target.value
-                  setSupplierId(value)
-                }}
-              >
-                {
-                  suppliers.slice(1).map((data) => (
-                    <option key={data.id} value={data.id}>{data.name}</option>
-                  ))
-                }
-              </select>
-            </div>
-            <div className='grid grid-cols-7 items-center'>
-              <label className='col-span-2 text-left'>Nopol</label>
-              <p className='col-span-1'>:</p>
-              <input
-                className='col-span-4 border w-[150px] rounded-md'
-                onChange={(e) => setPlateNumber(e.target.value)}
-              ></input>
-            </div>
-            <div className='grid grid-cols-7 items-center'>
-              <label className='col-span-2 text-left'>Jenis Beras</label>
-              <p className='col-span-1'>:</p>
-              <select
-                className='col-span-4 border p-[2px] w-[150px] rounded-md' name='material_type' id='materials'
+                className='col-span-4 border p-[6px] rounded-md w-full'
+                name='material_type'
+                id='materials'
                 onChange={(e) => {
                   const value = e.target.value;
-                  setMaterialType(value);
+                  setProductName(value);
                 }}
               >
-                <option key={1} value={1}>IR64 A</option>
-                <option key={2} value={2}>IR64 B</option>
-                <option key={3} value={3}>IR64 C</option>
-                <option key={4} value={4}>Bramo</option>
+                {products?.slice(2).map((data) => (
+                  <option key={data.id} value={data.id}>
+                    {data.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div className='grid grid-cols-7 items-center'>
-              <label className='col-span-2 text-left'>Jumlah</label>
+
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Stok Saat Ini</label>
               <p className='col-span-1'>:</p>
               <input
-                className='col-span-4 border w-[150px] rounded-md'
+                type='number'
+                className='col-span-4 border p-[6px] rounded-md w-full'
                 onChange={(e) => setAmount(e.target.value)}
-              ></input>
+              />
+            </div>
+
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Deskripsi</label>
+              <p className='col-span-1'>:</p>
+              <textarea
+                className='col-span-4 border p-[6px] rounded-md w-full'
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
           </div>
+
           <button
             className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
             onClick={handleAddStock}
@@ -371,45 +345,44 @@ const Home = () => {
       >
         <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>TAMBAH DATA PENJUALAN</h2>
-          <div className='flex gap-2'>
-            <div className='text-left'>
-              <label>Customer:</label>
+          <div className='grid grid-cols-1 gap-3'>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Jenis Produk</label>
+              <p className='col-span-1'>:</p>
               <select
-                className='border p-[2px] w-[150px] rounded-md' name="customers" id="customers"
+                className='col-span-4 border p-[6px] rounded-md w-full'
+                name='material_type'
+                id='materials'
                 onChange={(e) => {
-                  const value = e.target.value
-                  setCustomerId(value)
-                  console.log(value)
+                  const value = e.target.value;
+                  setProductName(value);
                 }}
               >
-                {
-                  customers.map((data) => (
-                    <option key={data.id} value={data.id}>{data.name}</option>
-                  ))
-                }
+                {products.slice(2).map((data) => (
+                  <option key={data.id} value={data.id}>
+                    {data.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div className='text-left'>
-              <label>Jenis Beras:</label>
-              <select
-                className='border p-[2px] w-[150px] rounded-md' name='material_type' id='materials'
-                onChange={(e) => {
-                  const value = e.target.value
-                  setMaterialType(value)
-                }}
-              >
-                <option key={1} value={1}>IR64 A</option>
-                <option key={2} value={2}>IR64 B</option>
-                <option key={3} value={3}>IR64 C</option>
-                <option key={4} value={4}>Bramo</option>
-              </select>
-            </div>
-            <div className='text-left'>
-              <label>Jumlah:</label>
+
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Jumlah</label>
+              <p className='col-span-1'>:</p>
               <input
-                className='border w-[150px] rounded-md'
+                type='number'
+                className='col-span-4 border p-[6px] rounded-md w-full'
                 onChange={(e) => setAmount(e.target.value)}
-              ></input>
+              />
+            </div>
+
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Deskripsi</label>
+              <p className='col-span-1'>:</p>
+              <textarea
+                className='col-span-4 border p-[6px] rounded-md w-full'
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
           </div>
           <button
@@ -428,15 +401,16 @@ const Home = () => {
       >
         <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>PINDAH GUDANG</h2>
-          <div className='flex gap-4'>
-            <div className='text-left w-[50%]'>
-              <label>Tujuan:</label>
+          <div className='grid grid-cols-1 gap-3'>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Tujuan:</label>
+              <p className='col-span-1'>:</p>
               <select 
                 onChange={(e) => {
                   const value = e.target.value
                   setDestinationWarehouse(value)
                 }}
-                className='border p-[2px] w-full rounded-md' 
+                className='col-span-4 border p-[2px] rounded-md' 
                 name="cars" id="cars">
                 <option value={1}>GD 1</option>
                 <option value={2}>GD 2</option>
@@ -446,25 +420,30 @@ const Home = () => {
                 <option value={6}>GD 6</option>
               </select>
             </div>
-            <div className='text-left w-[50%]'>
-              <label>Jenis Beras:</label>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Jenis Produk</label>
+              <p className='col-span-1'>:</p>
               <select
-                className='border p-[2px] w-full rounded-md' name='material_type' id='materials'
+                className='col-span-4 border p-[2px] rounded-md w-full'
+                name='material_type'
+                id='materials'
                 onChange={(e) => {
-                  const value = e.target.value
-                  setMaterialType(value)
+                  const value = e.target.value;
+                  setProductName(value);
                 }}
               >
-                <option key={1} value={1}>IR64 A</option>
-                <option key={2} value={2}>IR64 B</option>
-                <option key={3} value={3}>IR64 C</option>
-                <option key={4} value={4}>Bramo</option>
+                {products.slice(2).map((data) => (
+                  <option key={data.id} value={data.id}>
+                    {data.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div className='text-left w-[50%]'>
-              <label>Jumlah:</label>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Jumlah</label>
+              <p className='col-span-1'>:</p>
               <input
-                className='border w-full rounded-md'
+                className='border col-span-4 rounded-md'
                 onChange={(e) => {
                   const value = e.target.value
                   setAmount(value)
@@ -486,28 +465,31 @@ const Home = () => {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box className="text-center border rounded-lg p-5 w-[400px]" sx={{ ...style }}>
-          <h2 className='font-semibold text-center pb-3'>TAMBAH STOK KELUAR</h2>
+        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+          <h2 className='font-semibold text-center pb-3'>TAMBAH BAHAN UNTUK GILING</h2>
           <div className='flex gap-4 justify-beetween w-full'>
             <div className='text-left w-[50%]'>
-              <label>Jenis Beras:</label>
+              <label className='col-span-2'>Jenis Produk</label>
               <select
-                className='border p-[2px] w-full rounded-md' name='material_type' id='materials'
+                className='col-span-4 border p-[6px] rounded-md w-full'
+                name='material_type'
+                id='materials'
                 onChange={(e) => {
-                  const value = e.target.value
-                  setMaterialType(value)
+                  const value = e.target.value;
+                  setProductName(value);
                 }}
               >
-                <option key={1} value={1}>IR64 A</option>
-                <option key={2} value={2}>IR64 B</option>
-                <option key={3} value={3}>IR64 C</option>
-                <option key={4} value={4}>Bramo</option>
+                {products?.slice(2).map((data) => (
+                  <option key={data.id} value={data.id}>
+                    {data.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className='text-left w-[50%]'>
               <label>Jumlah:</label>
               <input
-                className='border w-full rounded-md'
+                className='border w-full rounded-md p-[6px]'
                 onChange={(e) => {
                   const value = e.target.value
                   setAmount(value)
@@ -516,7 +498,7 @@ const Home = () => {
             </div>
           </div>
           <button
-            className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
+            className={"bg-blue-1 text-[#ffff] px-6 py-2 mt-3 rounded-xl font-semibold m-auto"}
             onClick={handleReduceStock}
           >TAMBAH</button>
         </Box>
@@ -532,7 +514,10 @@ const Home = () => {
           <div className='flex gap-1'>
             <button
               className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
-              onClick={() => handleDelete(dataId)}
+              onClick={() => {
+                console.log(`INI ID NYA ${dataId}`)
+                handleDelete(dataId)
+              }}
             >HAPUS</button>
             <button
               className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
@@ -618,29 +603,11 @@ const Home = () => {
         <table className="text-[12px] table-auto overflow-auto border-collapse border border-gray-800 text-center w-full">
           <thead className="sticky top-0 bg-blue-1">
             <tr className="bg-blue-600 text-[white]">
-              <th rowSpan="2" className="border border-[white] p-2">NO</th>
-              <th rowSpan="2" className="border border-[white] p-2">SUPPLIER</th>
-              <th rowSpan="2" className="border border-[white] p-2">NOPOL</th>
-              <th colSpan="4" className="border border-[white] p-2">MASUK</th>
-              <th colSpan="4" className="border border-[white] p-2">KELUAR</th>
-              <th colSpan="4" className="border border-[white] p-2">TOTAL</th>
-              <th colSpan="2" className="border border-[white] p-2">GLOBAL</th>
-            </tr>
-            <tr className="bg-blue-600 text-[white]">
-              <th className="border border-[white] p-2">A</th>
-              <th className="border border-[white] p-2">B</th>
-              <th className="border border-[white] p-2">C</th>
-              <th className="border border-[white] p-2">BR</th>
-              <th className="border border-[white] p-2">A</th>
-              <th className="border border-[white] p-2">B</th>
-              <th className="border border-[white] p-2">C</th>
-              <th className="border border-[white] p-2">BR</th>
-              <th className="border border-[white] p-2">A</th>
-              <th className="border border-[white] p-2">B</th>
-              <th className="border border-[white] p-2">C</th>
-              <th className="border border-[white] p-2">BR</th>
-              <th className="border border-[white] p-2">IR64</th>
-              <th className="border border-[white] p-2">BR</th>
+              <th className="border border-[white] p-2">NO</th>
+              <th className="border border-[white] p-2">JENIS TRANSAKSI</th>
+              <th className="border border-[white] p-2">NAMA PRODUK</th>
+              <th className="border border-[white] p-2">JUMLAH (SAK)</th>
+              <th className="border border-[white] p-2">KETERANGAN</th>
             </tr>
           </thead>          
           <tbody className='text-[#000000] border-[white]'>
@@ -648,103 +615,44 @@ const Home = () => {
               stocks.map((row, idx) => (
                 <tr key={idx} onContextMenu={(event) => handleRightClick(event, idx, row.id)} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
                   <td>{idx + 1}</td>
-                  <td 
-                    className={
-                      row.transaction_type === 'giling' 
-                        ? 'text-[white] bg-[red] text-left w-[150px]' 
-                        : row.transaction_type === 'pindah'
-                        ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
-                        : row.transaction_type === 'jual'
-                        ? 'text-[#000000] bg-[#52ff0d] text-left w-[150px]'
-                        : 'text-left w-[150px]'
-                    }>
+                  <td className='text-left'>
                     {
-                      row.transaction_type === 'giling' 
-                        ? 'GILING' 
-                        : row.transaction_type === 'pindah' 
-                        ? row.description.toUpperCase()
-                        : row.transaction_type === 'jual' 
-                        ? row.customer.toUpperCase()
-                        : row.supplier === 'Others' 
-                        ? row.description.toUpperCase()
-                        : row.supplier.toUpperCase()
+                      row.transaksi === "masuk" && row.deskripsi.slice(0, 2) === "GD" ? `PINDAH DARI ${row.deskripsi}`
+                      : row.transaksi === "masuk" ? "HASIL GILING"
+                      : row.transaksi === "jual" ? "STOK KELUAR"
+                      : row.transaksi === "giling" ? "STOK KELUAR"
+                      : row.transaksi === "pindah" ? "PINDAH"
+                      : row.deskripsi.toUpperCase()
                     }
                   </td>
-                  <td>{ row.plate_number }</td>
-                  <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{row.totalA}</td>
-                  <td>{row.totalB}</td>
-                  <td>{row.totalC}</td>
-                  <td>{row.totalBr}</td>
-                  <td>{row.totalIR64}</td>
-                  <td>{row.totalGlobalBr}</td>
+                  <td>{row.produk}</td>
+                  <td>{row.total}</td>
+                  <td>{row.deskripsi !== "" ? row.deskripsi.toUpperCase() : "-"}</td>
                 </tr>
               ))
               :
               stocks.map((row, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td 
-                    className={
-                      row.transaction_type === 'giling' 
-                        ? 'text-[white] bg-[red] text-left w-[150px]' 
-                        : row.transaction_type === 'pindah'
-                        ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
-                        : row.transaction_type === 'jual'
-                        ? 'text-[#000000] bg-[#66ff0d] text-left w-[150px]'
-                        : 'text-left w-[150px]'
-                    }>
+                  <td className='text-left'>
                     {
-                      row.transaction_type === 'giling' 
-                        ? 'GILING' 
-                        : row.transaction_type === 'pindah' 
-                        ? row.description.toUpperCase()
-                        : row.transaction_type === 'jual' 
-                        ? row.customer.toUpperCase()
-                        : row.supplier === 'Others' 
-                        ? row.description.toUpperCase()
-                        : row.supplier.toUpperCase()
+                      row.transaksi === "masuk" && row.deskripsi.slice(0, 2) === "GD" ? `PINDAH DARI ${row.deskripsi}`
+                      : row.transaksi === "masuk" ? "HASIL GILING"
+                      : row.transaksi === "jual" ? "STOK KELUAR"
+                      : row.transaksi === "giling" ? "STOK KELUAR"
+                      : row.transaksi === "pindah" ? "PINDAH"
+                      : row.deskripsi.toUpperCase()
                     }
                   </td>
-                  <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                  <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  <td>{row.totalA}</td>
-                  <td>{row.totalB}</td>
-                  <td>{row.totalC}</td>
-                  <td>{row.totalBr}</td>
-                  <td>{row.totalIR64}</td>
-                  <td>{row.totalGlobalBr}</td>
+                  <td>{row.produk}</td>
+                  <td>{row.total}</td>
+                  <td>{row.deskripsi !== "" ? row.deskripsi : "-"}</td>
                 </tr>
               ))
             }
             {
-              Array.from({ length: Math.max(0, 9 - stocks.length) }).map((_, idx) => (
+              Array.from({ length: Math.max(0, 10 - stocks.length) }).map((_, idx) => (
                 <tr key={`empty-${idx}`}>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
-                  <td className="border border-gray-800">&nbsp;</td>
                   <td className="border border-gray-800">&nbsp;</td>
                   <td className="border border-gray-800">&nbsp;</td>
                   <td className="border border-gray-800">&nbsp;</td>
@@ -755,6 +663,48 @@ const Home = () => {
             }
           </tbody>
         </table>
+      </div>
+
+      <div className='border border-[#f4f4f4] px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
+        <p className='font-bold'>RINCIAN</p>
+        <div className='flex justify-between'>
+          <div>
+            <p className='font-bold'>TOTAL STOK</p>
+            {
+              productReports.stok?.map((row, idx) => (
+                row.total_stok !== 0 ?
+                  <div>
+                    <li id={idx}>{row.product_name} : {row.total_stok} sak</li>
+                  </div>
+                : <div></div>
+              ))
+            }
+          </div>
+          <div>
+            <p className='font-bold'>HASIL GILING</p>
+            {
+              productReports.hasil_giling?.map((row, idx) => (
+                row.hasil_giling !== 0 ?
+                  <div>
+                    <li id={idx}>{row.product_name} : {row.hasil_giling} sak</li>
+                  </div>
+                : <div></div>
+              ))
+            }
+          </div>
+          <div>
+            <p className='font-bold'>STOK KELUAR</p>
+            {
+              productReports.stok_keluar?.map((row, idx) => (
+                row.total_keluar !== 0 ?
+                  <div>
+                    <li id={idx}>{row.product_name} : {row.total_keluar} sak</li>
+                  </div>
+                : <div></div>
+              ))
+            }
+          </div>
+        </div>
       </div>
 
       {contextMenu.visible && (
@@ -774,4 +724,4 @@ const Home = () => {
   )
 }
 
-export default Home;
+export default Produk;
