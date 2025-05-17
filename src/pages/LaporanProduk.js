@@ -5,7 +5,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const LaporanProduk = () => {
   const [startDate, setStartDate] = useState(new Date());
-  const [error, setError] = useState("")
   const [reports, setReports] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const date = startDate.toLocaleDateString('en-CA')
@@ -16,7 +15,6 @@ const LaporanProduk = () => {
         const response = await getProductStockReport(date)
         setReports(response.data.data)
       } catch (err) {
-        setError(err.message)
         alert(err.message)
       }
     }
