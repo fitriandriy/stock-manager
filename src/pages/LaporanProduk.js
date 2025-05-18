@@ -4,7 +4,7 @@ import NavBar from "../components/NavBar";
 import "react-datepicker/dist/react-datepicker.css";
 
 const LaporanProduk = () => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate] = useState(new Date());
   const [reports, setReports] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const date = startDate.toLocaleDateString('en-CA')
