@@ -1,72 +1,130 @@
 import React from "react";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { useNavigate } from "react-router-dom";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { useNavigate, useLocation } from "react-router-dom"; // ⬅️ Tambahkan useLocation
 import { useApp } from "../context";
 
 const NavBar = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation(); // ⬅️ Untuk tahu path saat ini
   const { setUser, setIsAuthenticated } = useApp();
   const user = JSON.parse(localStorage.getItem("user"));
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  const [anchorElBahan, setAnchorElBahan] = React.useState(null);
+  const [anchorElProduk, setAnchorElProduk] = React.useState(null);
+  const [anchorElLaporan, setAnchorElLaporan] = React.useState(null);
+
+  const handleClick = (setAnchorEl) => (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (setAnchorEl) => () => {
     setAnchorEl(null);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setIsAuthenticated(false);
-    setUser('');
-    navigate('/login');
-  }
+    setUser("");
+    navigate("/login");
+  };
 
   return (
     <div className="flex justify-between py-5 px-20">
       <div className="flex gap-5">
-        <img src="./assets/icon.png" className="w-[100px] h-[25px]" alt=""></img>
-        <nav class="flex gap-10 ml-10 font-bold text-zinc-600">
+        <img src="./assets/icon.png" className="w-[100px] h-[25px]" alt="" />
+        <nav className="flex gap-10 ml-10 font-bold text-zinc-600">
+          {/* BAHAN */}
           <div>
             <p
-              className="cursor-pointer"
-              onClick={handleClick}
+              className={`cursor-pointer ${
+                ["/home", "/laporan"].includes(location.pathname)
+                  ? "underline text-blue-600"
+                  : ""
+              }`}
+              onClick={handleClick(setAnchorElBahan)}
             >
-              STOCK
+              BAHAN
             </p>
             <Menu
-              id="demo-positioned-menu"
-              aria-labelledby="demo-positioned-button"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
+              className="mt-8"
+              anchorEl={anchorElBahan}
+              open={Boolean(anchorElBahan)}
+              onClose={handleClose(setAnchorElBahan)}
+              anchorOrigin={{ vertical: "top", horizontal: "left" }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }}
             >
               <MenuItem onClick={() => navigate("/home")}>Input Data</MenuItem>
-              <MenuItem onClick={() => navigate("/laporan")}>Laporan Stok</MenuItem>
+              <MenuItem onClick={() => navigate("/laporan")}>Stok Bahan</MenuItem>
             </Menu>
           </div>
-          <p className="cursor-pointer" onClick={handleLogout}>EXIT</p>
+
+          {/* PRODUCT */}
+          <div>
+            <p
+              className={`cursor-pointer ${
+                ["/produk", "/laporan-produk"].includes(location.pathname)
+                  ? "underline text-blue-600"
+                  : ""
+              }`}
+              onClick={handleClick(setAnchorElProduk)}
+            >
+              PRODUCT
+            </p>
+            <Menu
+              className="mt-8"
+              anchorEl={anchorElProduk}
+              open={Boolean(anchorElProduk)}
+              onClose={handleClose(setAnchorElProduk)}
+              anchorOrigin={{ vertical: "top", horizontal: "left" }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }}
+            >
+              <MenuItem onClick={() => navigate("/produk")}>Input Data</MenuItem>
+              <MenuItem onClick={() => navigate("/laporan-produk")}>Stok Produk</MenuItem>
+            </Menu>
+          </div>
+
+          {/* LAPORAN */}
+          <div>
+            <p
+              className={`cursor-pointer ${
+                ["/proses-produksi", "/laporan-hasil-produksi", "/fullskill"].includes(location.pathname)
+                  ? "underline text-blue-600"
+                  : ""
+              }`}
+              onClick={handleClick(setAnchorElLaporan)}
+            >
+              LAPORAN
+            </p>
+            <Menu
+              className="mt-8"
+              anchorEl={anchorElLaporan}
+              open={Boolean(anchorElLaporan)}
+              onClose={handleClose(setAnchorElLaporan)}
+              anchorOrigin={{ vertical: "top", horizontal: "left" }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }}
+            >
+              <MenuItem onClick={() => navigate("/proses-produksi")}>Proses Produksi</MenuItem>
+              <MenuItem onClick={() => navigate("/laporan-hasil-produksi")}>Hasil Produksi</MenuItem>
+              <MenuItem onClick={() => navigate("/fullskill")}>Fullskill</MenuItem>
+            </Menu>
+          </div>
         </nav>
       </div>
-      <div className="flex gap-3">
-        <img src="./assets/profile-icon.png" className="w-8" alt=""></img>
-        <p>{user ? user.toUpperCase() : ""}</p>
+
+      <div className="flex gap-5">
+        <div className="flex gap-1">
+          <img src="./assets/exit.png" className="w-7" alt="" />
+          <p className="cursor-pointer" onClick={handleLogout}>EXIT</p>
+        </div>
+        <div className="flex gap-1">
+          <img src="./assets/profile-icon.png" className="w-8" alt="" />
+          <p>{user ? user.toUpperCase() : ""}</p>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NavBar
+export default NavBar;

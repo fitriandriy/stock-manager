@@ -1,0 +1,18 @@
+[
+  {
+    "tanggal": "2025-05-16",
+    "warehouse": 6,
+    "bahan_giling": 20000,
+    "f1": 19998,
+    "hasil_giling": 18000,
+    "f2": 17998
+  },
+  {
+    "tanggal": "2025-05-17",
+    "warehouse": 6,
+    "bahan_giling": 20000,
+    "f1": 19998,
+    "hasil_giling": 18000,
+    "f2": 17998
+  }
+]

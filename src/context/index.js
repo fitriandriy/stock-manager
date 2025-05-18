@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
 import axios from "axios";
+const ENDPOINT = process.env.REACT_APP_API_URL;
 
 export const AppContext = createContext()
 
@@ -8,7 +9,7 @@ export const AppProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = async (username, password) => {
-    const response = await axios.post("http://localhost:8000/auth/login", {
+    const response = await axios.post(`${ENDPOINT}/auth/login`, {
       username,
       password
     });
