@@ -713,6 +713,7 @@ const Home = () => {
                         : row.supplier.toUpperCase()
                     }
                   </td>
+                  <td>{ row.plate_number }</td>
                   <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
                   <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
                   <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>

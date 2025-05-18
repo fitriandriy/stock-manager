@@ -77,7 +77,7 @@ const LaporanHasilProduksi = () => {
         <p className=''>LAPORAN HASIL PRODUKSI</p>
       </div>
 
-      <div className="mx-20 mt-5 overflow-auto border rounded-lg border-gray-300">
+      <div className="mx-20 mt-5 overflow-auto border rounded-lg border-gray-300 h-[400px]">
         <table className="min-w-[1000px] border-collapse relative">
           <thead className='sticky top-0 bg-blue-1'>
             <tr className="bg-gray-100 text-[white]">
@@ -107,7 +107,6 @@ const LaporanHasilProduksi = () => {
               <th key='17' className="sticky z-10 bg-gray-100 border w-full">LEBAH10</th>
               <th key='18' className="sticky z-10 bg-gray-100 border w-full">BROKEN</th>
               <th key='19' className="sticky z-10 bg-gray-100 border w-full">MENIR KIBI</th>
-              <th key='20' className="sticky z-10 bg-gray-100 border w-full">TEPUNG</th>
               <th key='21' className="sticky z-10 bg-gray-100 border w-full">KATUL</th>
               <th key='22' className="sticky z-10 bg-gray-100 border w-full">MENDANG</th>
               <th key='23' className="sticky z-10 bg-gray-100 border w-full">POLOS</th>
@@ -116,7 +115,6 @@ const LaporanHasilProduksi = () => {
           </thead>
           <tbody className="bg-white">
             {/* hasil produksi */}
-            
             {
               hasilProduksi.hasil_produksi.map((row, idx) => (
                 <tr>
@@ -141,7 +139,6 @@ const LaporanHasilProduksi = () => {
                   <td>{row.hasil_produksi.find(item => item.product_id === 16)?.total ? (row.hasil_produksi.find(item => item.product_id === 16)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 17)?.total ? (row.hasil_produksi.find(item => item.product_id === 17)?.total * 10).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 18)?.total ? (row.hasil_produksi.find(item => item.product_id === 18)?.total * 50).toLocaleString('id-ID') : "-"}</td>
-                  <td>{row.hasil_produksi.find(item => item.product_id === 19)?.total ? (row.hasil_produksi.find(item => item.product_id === 19)?.total * 50).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 20)?.total ? (row.hasil_produksi.find(item => item.product_id === 20)?.total * 10).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 22)?.total ? (row.hasil_produksi.find(item => item.product_id === 22)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 23)?.total ? (row.hasil_produksi.find(item => item.product_id === 23)?.total * 50).toLocaleString('id-ID') : "-"}</td>
@@ -150,8 +147,17 @@ const LaporanHasilProduksi = () => {
                 </tr>
               ))
             }
+            {
+              Array.from({ length: Math.max(0, 9 - hasilProduksi.hasil_produksi.length) }).map((_, idx) => (
+                <tr key={`empty-${idx}`}>
+                  {Array.from({ length: 26 }).map((_, cellIdx) => (
+                    <td key={cellIdx} className="border border-gray-800 h-[40px] bg-gray-50">&nbsp;</td>
+                  ))}
+                </tr>
+              ))
+            }
             {/* total */}
-            <tr className='sticky bottom-0 bg-white z-10 font-bold'>
+            <tr className='sticky bottom-8 bg-[#d5d5d5] z-10 font-bold'>
               <td className="left-0 border p-2 text-center bg-white z-20">TOTAL</td>
               <td className="border p-2 text-center">{(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3)?.total * 25).toLocaleString('id-ID') : "-"}</td>
@@ -173,7 +179,6 @@ const LaporanHasilProduksi = () => {
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)?.total * 10).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 18)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 18)?.total * 50).toLocaleString('id-ID') : "-"}</td>
-              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 19)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 19)?.total * 50).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 20)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 20)?.total * 10).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23)?.total * 50).toLocaleString('id-ID') : "-"}</td>
@@ -182,7 +187,7 @@ const LaporanHasilProduksi = () => {
 
             </tr>
             {/* presentase */}
-            <tr className='bottom-0 bg-white z-10 font-bold'>
+            <tr className='sticky bottom-0 bg-[#d5d5d5] bg-white z-10 font-bold'>
               <td className="left-0 border text-center bg-white z-20">PRESENTASE</td>
               <td className="border text-center"></td>
               <td>
@@ -315,13 +320,6 @@ const LaporanHasilProduksi = () => {
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 18)
                     ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 18).total * 50) / (hasilProduksi.total_bahan_giling * 50)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 19)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 19).total * 50) / (hasilProduksi.total_bahan_giling * 50)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>

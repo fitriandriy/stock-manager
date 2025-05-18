@@ -54,7 +54,7 @@ const ProsesProduksi = () => {
           <p>IR 64 : {parseInt(reports[0]?.stock) * 50} KG</p>
           <p>BRAMO : {parseInt(reports[1]?.stock) * 50} KG</p>
         </div>
-        <div className='flex justify-between mx-44 pt-5 mb-10'>
+        <div className='flex gap-5 justify-between mx-44 pt-5 mb-10'>
           <div>
             <table className='rounded-lg'>
               <thead className='bg-[#29c631] text-[white]'>
