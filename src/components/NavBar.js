@@ -6,7 +6,7 @@ import { useApp } from "../context";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // ⬅️ Untuk tahu path saat ini
+  const location = useLocation();
   const { setUser, setIsAuthenticated } = useApp();
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -107,7 +107,6 @@ const NavBar = () => {
             >
               <MenuItem onClick={() => navigate("/proses-produksi")}>Proses Produksi</MenuItem>
               <MenuItem onClick={() => navigate("/laporan-hasil-produksi")}>Hasil Produksi</MenuItem>
-              <MenuItem onClick={() => navigate("/fullskill")}>Fullskill</MenuItem>
             </Menu>
           </div>
         </nav>

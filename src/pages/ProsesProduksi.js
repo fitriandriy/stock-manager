@@ -264,10 +264,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BERAS PRE @ 25 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[5]?.stock}</td>
-                  <td>{reports[5]?.hasil_giling * 10} KG</td>
+                  <td>{reports[5]?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[5]?.stock * 10}</td>
+                  <td>{reports[5]?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[5]?.keluar.jual}</td>
                   <td></td>
@@ -288,10 +288,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BERAS PRE @ 5 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[7]?.stock}</td>
-                  <td>{reports[7]?.hasil_giling * 10} KG</td>
+                  <td>{reports[7]?.hasil_giling * 5} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[7]?.stock * 10}</td>
+                  <td>{reports[7]?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[7]?.keluar.jual}</td>
                   <td></td>
@@ -300,10 +300,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BERAS MANGGA @ 25 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[8]?.stock}</td>
-                  <td>{reports[8]?.hasil_giling * 10} KG</td>
+                  <td>{reports[8]?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[8]?.stock * 10}</td>
+                  <td>{reports[8]?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[8]?.keluar.jual}</td>
                   <td></td>
@@ -324,10 +324,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BERAS LEBAH @ 25 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[15]?.stock}</td>
-                  <td>{reports[15]?.hasil_giling * 10} KG</td>
+                  <td>{reports[15]?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[15]?.stock * 10}</td>
+                  <td>{reports[15]?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[15]?.keluar.jual}</td>
                   <td></td>
@@ -348,10 +348,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BROKEN PREMIUM @ 50 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[10]?.stock}</td>
-                  <td>{reports[10]?.hasil_giling * 10} KG</td>
+                  <td>{reports[10]?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[10]?.stock * 10}</td>
+                  <td>{reports[10]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[10]?.keluar.jual}</td>
                   <td></td>
@@ -360,10 +360,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>MENIR KIBI PREM @ 50 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[11]?.stock}</td>
-                  <td>{reports[11]?.hasil_giling * 10} KG</td>
+                  <td>{reports[11]?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[11]?.stock * 10}</td>
+                  <td>{reports[11]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[11]?.keluar.jual}</td>
                   <td></td>
@@ -372,10 +372,10 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BERAS EKONOMI @ 25 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[13]?.stock}</td>
-                  <td>{reports[13]?.hasil_giling * 10} KG</td>
+                  <td>{reports[13]?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[13]?.stock * 10}</td>
+                  <td>{reports[13]?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[13]?.keluar.jual}</td>
                   <td></td>
