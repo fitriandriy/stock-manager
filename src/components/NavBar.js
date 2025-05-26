@@ -1,8 +1,9 @@
 import React from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate, useLocation } from "react-router-dom"; // ⬅️ Tambahkan useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "../context";
+import { jwtDecode } from "jwt-decode";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ const NavBar = () => {
   const [anchorElBahan, setAnchorElBahan] = React.useState(null);
   const [anchorElProduk, setAnchorElProduk] = React.useState(null);
   const [anchorElLaporan, setAnchorElLaporan] = React.useState(null);
+
+  const token = localStorage.getItem("token")
+  const role = jwtDecode(token).role;
 
   const handleClick = (setAnchorEl) => (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,10 +35,12 @@ const NavBar = () => {
   };
 
   return (
-    <div className="flex justify-between py-5 px-20">
-      <div className="flex gap-5">
-        <img src="./assets/icon.png" className="w-[100px] h-[25px]" alt="" />
-        <nav className="flex gap-10 ml-10 font-bold text-zinc-600">
+    <div className="flex justify-between py-5 px-5 lg:px-20">
+      {
+        role === 'superadmin' ?
+          <div className="flex gap-5">
+        <img src="./assets/icon.png" className="h-[25px] w-50px lg:w-[100px] lg:h-[25px]" alt="" />
+        <nav className="flex lg:gap-10 ml-10 font-bold text-zinc-600">
           {/* BAHAN */}
           <div>
             <p
@@ -110,7 +116,12 @@ const NavBar = () => {
             </Menu>
           </div>
         </nav>
-      </div>
+          </div>
+        :
+          <div className="flex gap-5">
+            <img src="./assets/icon.png" className="h-[25px] w-50px lg:w-[100px] lg:h-[25px]" alt="" />
+          </div>
+      }
 
       <div className="flex gap-5">
         <div className="flex gap-1">

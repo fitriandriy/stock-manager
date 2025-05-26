@@ -87,6 +87,20 @@ export const getCustomers = async () => {
   }
 }
 
+export const getWarehouses = async () => {
+  const token = localStorage.getItem("token")
+  try {
+    const response = await axios.get(`${ENDPOINT}/warehouses`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response
+  } catch (error) {
+    alert(error)
+  }
+}
+
 export const deleteStock = async (id) => {
   try {
     const response = await axios.delete(`${ENDPOINT}/stocks/${id}`, {
