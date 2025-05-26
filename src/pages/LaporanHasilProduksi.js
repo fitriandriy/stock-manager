@@ -57,6 +57,9 @@ const LaporanHasilProduksi = () => {
     { product_id: 23, beratKemasan: 50 },
     { product_id: 24, beratKemasan: 1 },
     { product_id: 25, beratKemasan: 1 },
+    { product_id: 26, beratKemasan: 25 },
+    { product_id: 27, beratKemasan: 10 },
+    { product_id: 28, beratKemasan: 5 }
   ];
 
   // Menghitung total hasil produksi
