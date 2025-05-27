@@ -123,7 +123,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[18]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[18]?.keluar.jual}</td>
+                  <td>{reports[18]?.keluar.jual} + {reports[18]?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
@@ -135,7 +135,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[12]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[12]?.keluar.jual}</td>
+                  <td>{reports[12]?.keluar.jual} + {reports[12]?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
@@ -159,7 +159,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[20]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[20]?.keluar.jual}</td>
+                  <td>{reports[20]?.keluar.jual} + {reports[20]?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
@@ -183,7 +183,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[14]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[14]?.keluar.jual}</td>
+                  <td>{reports[14]?.keluar.jual} + {reports[14]?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
@@ -353,7 +353,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[10]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[10]?.keluar.jual}</td>
+                  <td>{reports[10]?.keluar.jual} + {reports[10]?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
@@ -365,7 +365,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[11]?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[11]?.keluar.jual}</td>
+                  <td>{reports[11]?.keluar.jual} + {reports[11]?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
@@ -377,7 +377,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[13]?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[13]?.keluar.jual}</td>
+                  <td>{reports[13]?.keluar.jual} + {reports[13]?.keluar.giling}</td>
                   <td></td>
                 </tr>
               </tbody>
