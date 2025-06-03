@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/style-prop-object */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import NavBar from "../components/NavBar"
 import DatePicker from "react-datepicker";
-import { useApp } from '../context'
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -21,7 +20,7 @@ const Home = () => {
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [deleteSuccess, setDeleteSuccess] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
-  const { currentWarehouse } = useApp()
+  const currentWarehouse = localStorage.getItem("warehouse")
   const [openStockPurchase, setOpenStockPurchase] = React.useState(false);
   const style = {
     position: 'absolute',
@@ -57,8 +56,46 @@ const Home = () => {
   const [materialType, setMaterialType] = useState(1)
   const [amount, setAmount] = useState(0)
   const [plateNumber, setPlateNumber] = useState()
-  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, rowIndex: null });
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: null, y: null, rowIndex: null });
   const [activeRow, setActiveRow] = useState(null);
+  
+  const handleContextOrLongPress = (e, idx, id) => {
+    e.preventDefault();
+    // handleRightClick(e, idx, id);
+    // e.preventDefault();
+    setActiveRow(idx)
+    setDataId(id)
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      rowIndex: idx,
+    });
+  };
+
+  const longPressTimeoutRef = useRef(null);
+
+  const createEventHandlers = (idx, id) => ({
+    onContextMenu: (e) => handleContextOrLongPress(e, idx, id),
+    onTouchStart: (e) => {
+      longPressTimeoutRef.current = setTimeout(() => {
+        setActiveRow(idx)
+        setDataId(id)
+        setContextMenu({
+          visible: true,
+          x: e.clientX,
+          y: e.clientY,
+          rowIndex: idx,
+        });
+      }, 1);
+    },
+    onTouchEnd: () => {
+      clearTimeout(longPressTimeoutRef.current);
+    },
+    onTouchMove: () => {
+      clearTimeout(longPressTimeoutRef.current);
+    }
+  });
 
   const handleChange = (event, newWarehouse) => {
     setWarehouse(newWarehouse);
@@ -195,6 +232,7 @@ const Home = () => {
 
   const handleClickOutside = () => {
     setContextMenu({ visible: false, x: 0, y: 0, rowIndex: null });
+    setActiveRow(null)
   };
 
   const handleDelete = async (id) => {
@@ -786,7 +824,7 @@ const Home = () => {
             <img className='w-5 h-5 mr-3' src="./assets/date.png" alt='date-icon'></img>
             {date}
           </div>
-          <p>GUDANG {currentWarehouse.slice(2)}</p>
+          <p>GUDANG {currentWarehouse}</p>
         </div>
 
         <Modal
@@ -1046,13 +1084,16 @@ const Home = () => {
         </Modal>
 
         <div className="overflow-x-auto mt-5 mx-5 h-80 border border-1 rounded-xl">
-          <table className="text-[12px] table-auto overflow-auto border-collapse border border-gray-800 text-center">
+          <table className="text-[12px] table-auto overflow-auto border-collapse border border-gray-800 text-center w-full">
             <thead className="sticky top-0 bg-blue-1">
               <tr className="bg-blue-600 text-[white]">
                 <th rowSpan="2" className="border border-[white] p-2">NO</th>
                 <th rowSpan="2" className="border border-[white] p-2">SUPPLIER</th>
+                <th rowSpan="2" className="border border-[white] p-2">NOPOL</th>
                 <th colSpan="4" className="border border-[white] p-2">MASUK</th>
                 <th colSpan="4" className="border border-[white] p-2">KELUAR</th>
+                <th colSpan="4" className="border border-[white] p-2">TOTAL</th>
+                <th colSpan="2" className="border border-[white] p-2">GLOBAL</th>
               </tr>
               <tr className="bg-blue-600 text-[white]">
                 <th className="border border-[white] p-2">A</th>
@@ -1062,50 +1103,73 @@ const Home = () => {
                 <th className="border border-[white] p-2">A</th>
                 <th className="border border-[white] p-2">B</th>
                 <th className="border border-[white] p-2">C</th>
+                <th className="border border-[white] p-2">BR</th>
+                <th className="border border-[white] p-2">A</th>
+                <th className="border border-[white] p-2">B</th>
+                <th className="border border-[white] p-2">C</th>
+                <th className="border border-[white] p-2">BR</th>
+                <th className="border border-[white] p-2">IR64</th>
                 <th className="border border-[white] p-2">BR</th>
               </tr>
             </thead>          
             <tbody className='text-[#000000] border-[white]'>
               {
-                stocks.map((row, idx) => (
-                  <tr key={idx} onContextMenu={(event) => handleRightClick(event, idx, row.id)} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
-                    <td>{idx + 1}</td>
-                    <td 
-                      className={
-                        row.transaction_type === 'giling' 
-                          ? 'text-[white] bg-[red] text-left w-[150px]' 
-                          : row.transaction_type === 'pindah'
-                          ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
-                          : row.transaction_type === 'jual'
-                          ? 'text-[#000000] bg-[#52ff0d] text-left w-[150px]'
-                          : 'text-left w-[150px]'
-                      }>
-                      {
-                        row.transaction_type === 'giling' 
-                          ? 'GILING' 
-                          : row.transaction_type === 'pindah' 
-                          ? row.description.toUpperCase()
-                          : row.transaction_type === 'jual' 
-                          ? row.customer.toUpperCase()
-                          : row.supplier === 'Others' 
-                          ? row.description.toUpperCase()
-                          : row.supplier.toUpperCase()
-                      }
-                    </td>
-                    <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                  </tr>
-                ))
+                stocks.map((row, idx) => {
+                  const bind = createEventHandlers(idx, row.id);
+                  return (
+                    <tr key={idx} {...bind} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
+                      <td>{idx + 1}</td>
+                      <td 
+                        className={
+                          row.transaction_type === 'giling' 
+                            ? 'text-[white] bg-[red] text-left w-[150px]' 
+                            : row.transaction_type === 'pindah'
+                            ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
+                            : row.transaction_type === 'jual'
+                            ? 'text-[#000000] bg-[#52ff0d] text-left w-[150px]'
+                            : 'text-left w-[150px]'
+                        }>
+                        {
+                          row.transaction_type === 'giling' 
+                            ? 'GILING' 
+                            : row.transaction_type === 'pindah' 
+                            ? row.description.toUpperCase()
+                            : row.transaction_type === 'jual' 
+                            ? row.customer.toUpperCase()
+                            : row.supplier === 'Others' 
+                            ? row.description.toUpperCase()
+                            : row.supplier.toUpperCase()
+                        }
+                      </td>
+                      <td>{ row.plate_number }</td>
+                      <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{row.totalA}</td>
+                      <td>{row.totalB}</td>
+                      <td>{row.totalC}</td>
+                      <td>{row.totalBr}</td>
+                      <td>{row.totalIR64}</td>
+                      <td>{row.totalGlobalBr}</td>
+                    </tr>
+                  )
+                })
               }
               {
                 Array.from({ length: Math.max(0, 9 - stocks.length) }).map((_, idx) => (
                   <tr key={`empty-${idx}`}>
+                    <td className="border border-gray-800">&nbsp;</td>
+                    <td className="border border-gray-800">&nbsp;</td>
+                    <td className="border border-gray-800">&nbsp;</td>
+                    <td className="border border-gray-800">&nbsp;</td>
+                    <td className="border border-gray-800">&nbsp;</td>
+                    <td className="border border-gray-800">&nbsp;</td>
+                    <td className="border border-gray-800">&nbsp;</td>
                     <td className="border border-gray-800">&nbsp;</td>
                     <td className="border border-gray-800">&nbsp;</td>
                     <td className="border border-gray-800">&nbsp;</td>

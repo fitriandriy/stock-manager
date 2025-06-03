@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Laporan from "../pages/Laporan";
+import Pembelian from "../pages/Pembelian";
 import LaporanProduk from "../pages/LaporanProduk";
 import LaporanHasilProduksi from "../pages/LaporanHasilProduksi";
 import Produk from "../pages/Produk";
@@ -20,6 +21,7 @@ const Router = () => {
         <Route exact path="/home" element={<PrivateRoute Component={Home} />} />
         <Route exact path="/produk" element={<PrivateRoute Component={Produk} />} />
         <Route exact path="/laporan" element={<PrivateRoute Component={Laporan} />} />
+        <Route exact path="/pembelian" element={<PrivateRoute Component={Pembelian} />} />
         <Route exact path="/laporan-produk" element={<PrivateRoute Component={LaporanProduk} />} />
         <Route exact path="/laporan-hasil-produksi" element={<PrivateRoute Component={LaporanHasilProduksi} />} />
         <Route exact path="/proses-produksi" element={<PrivateRoute Component={ProsesProduksi} />} />

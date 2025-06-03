@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useApp } from '../context'
 import { useNavigate } from 'react-router-dom'
 import { getWarehouses } from '../api'
 
 const SelectWarehouse = () => {
   const navigate = useNavigate()
   const [ warehouses, setWarehouse ] = useState([])
-  const { setCurrentWarehouse } = useApp()
 
   const changeWarehouse = (warehouse) => {
-    setCurrentWarehouse(warehouse);
+    localStorage.setItem("warehouse", warehouse)
   };
 
   useEffect(() => {
@@ -17,7 +15,6 @@ const SelectWarehouse = () => {
       try {
         const res = await getWarehouses()
         setWarehouse(res.data.data); 
-        console.log(JSON.stringify(res))
       } catch (err) {
         console.log(err.message); 
       }

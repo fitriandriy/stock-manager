@@ -307,18 +307,13 @@ export const getProductionProcessReport = async (date) => {
   }
 }
 
-// fullskills
-export const getFullskillByMonth = async (month) => {
+export const getPurchases = async (month, year) => {
   const token = localStorage.getItem("token")
   try {
-    const response = await axios.get(`${ENDPOINT}/fullskill`, {
+    const response = await axios.get(`${ENDPOINT}/purchases?month=${month}&year=${year}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      params: {
-        month,
-        warehouse_id: 6
-      }
     });
     return response
   } catch (error) {
@@ -326,15 +321,27 @@ export const getFullskillByMonth = async (month) => {
   }
 }
 
-export const addFullskill = async (date, f1, f2, editor_id) => {
+export const addCikIraPurchases = async (date, supplier_id, product_id, nominal) => {
   try {
-    const response = await axios.post(`${ENDPOINT}/fullskill`, {
-      warehouse_id: 6,
-      f1,
-      f2,
+    const response = await axios.post(`${ENDPOINT}/purchases`, {
       date,
-      editor_id,
+      supplier_id,
+      product_id,
+      nominal
     }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response
+  } catch (error) {
+    alert(error)
+  }
+}
+
+export const deletePurchaseData = async (id) => {
+  try {
+    const response = await axios.delete(`${ENDPOINT}/purchases/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
