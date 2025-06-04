@@ -36,6 +36,7 @@ const Produk = () => {
   const [productReports, setProductReports] = React.useState([])
   const [dataId, setDataId] = React.useState()
   const token = localStorage.getItem("token")
+  const currentWarehouse = localStorage.getItem("warehouse")
   let editorId = null;
   let role = null;
 
@@ -231,7 +232,15 @@ const Produk = () => {
     <div onClick={handleClickOutside} className='text-[#585858]'>
       <NavBar />
 
-      <div className='flex justify-between gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#a1acff]'>
+      <div className='md:hidden flex justify-between text-bold gap-2 py-2 px-5 mx-5 rounded-2xl bg-blue-1 text-[#ffff]'>
+        <div className='flex items-center'>
+          <img className='w-5 h-5 mr-3' src="./assets/date.png" alt='date-icon'></img>
+          {date}
+        </div>
+        <p>GUDANG {currentWarehouse}</p>
+      </div>
+
+      <div className='hidden lg:flex justify-between gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#a1acff]'>
         <div className='flex w-full gap-2 py-1 px-5 rounded-2xl bg-blue-1'>
           <img className='w-5 h-5 mt-[3px]' src="./assets/date.png" alt='date-icon'></img>
           <DatePicker
