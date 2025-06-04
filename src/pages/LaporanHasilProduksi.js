@@ -362,9 +362,14 @@ const LaporanHasilProduksi = () => {
         </table>
       </div>
 
-      <div className='mx-20 my-5'>
-        <p>SISA DALAM SILO (BAHAN GILING - TOTAL HASIL PRODUKSI)</p>
-        <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - {totalHasilProduksiKg.toLocaleString('id-ID')} = {((hasilProduksi.total_bahan_giling * 50) - totalHasilProduksiKg).toLocaleString('id-ID')} kg</p>
+      <div className='mx-20 my-5 flex justify-between'>
+        <div className=''>
+          <p>SISA DALAM SILO (BAHAN GILING - (TOTAL HASIL PRODUKSI - TOTAL PEMBELIAN PRODUK))</p>
+          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ({totalHasilProduksiKg.toLocaleString('id-ID')} - {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')}) = {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian)).toLocaleString('id-ID')} kg</p>
+        </div>
+        <div>
+          <p>TOTAL PEMBELIAN: {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')}</p>
+        </div>
       </div>
     </div>
   );
