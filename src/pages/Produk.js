@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/style-prop-object */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import NavBar from "../components/NavBar"
 import DatePicker from "react-datepicker";
 import Box from '@mui/material/Box';
@@ -189,6 +189,7 @@ const Produk = () => {
 
   const handleClickOutside = () => {
     setContextMenu({ visible: false, x: 0, y: 0, rowIndex: null });
+    setActiveRow(null)
   };
 
   const handleDelete = async (id) => {
@@ -205,6 +206,42 @@ const Produk = () => {
     }
     handleClickOutside();
   };
+
+  const handleContextOrLongPress = (e, idx, id) => {
+    e.preventDefault();
+    setActiveRow(idx)
+    setDataId(id)
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      rowIndex: idx,
+    });
+  };
+  
+  const longPressTimeoutRef = useRef(null);
+
+  const createEventHandlers = (idx, id) => ({
+    onContextMenu: (e) => handleContextOrLongPress(e, idx, id),
+    onTouchStart: (e) => {
+      longPressTimeoutRef.current = setTimeout(() => {
+        setActiveRow(idx)
+        setDataId(id)
+        setContextMenu({
+          visible: true,
+          x: e.clientX,
+          y: e.clientY,
+          rowIndex: idx,
+        });
+      }, 1);
+    },
+    onTouchEnd: () => {
+      clearTimeout(longPressTimeoutRef.current);
+    },
+    onTouchMove: () => {
+      clearTimeout(longPressTimeoutRef.current);
+    }
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -240,8 +277,8 @@ const Produk = () => {
         <p>GUDANG {currentWarehouse}</p>
       </div>
 
-      <div className='hidden lg:flex justify-between gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#a1acff]'>
-        <div className='flex w-full gap-2 py-1 px-5 rounded-2xl bg-blue-1'>
+      <div className='flex justify-between lg:gap-2 lg:px-5 mx-5 lg:mx-20 rounded-2xl p-1 shadow-md shadow-[#a1acff]'>
+        <div className='hidden lg:flex w-[20%] gap-2 py-1 px-5 rounded-2xl bg-blue-1'>
           <img className='w-5 h-5 mt-[3px]' src="./assets/date.png" alt='date-icon'></img>
           <DatePicker
             selected={startDate}
@@ -250,22 +287,32 @@ const Produk = () => {
             dateFormat="d-MM-yyyy"
           />
         </div>
-        <button
-          onClick={handleOpenAddStock}
-          className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
-        >+ HASIL GILING</button>
-        <button
-          onClick={handleOpenReduceStock}
-          className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
-        >+ GILING</button>
-        <button
-          onClick={handleOpenStockPurchase}
-          className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
-        >+ PENJUALAN</button>
-        <button
-          onClick={handleOpenTransferStock}
-          className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
-        >PINDAH GUDANG</button>
+        <div className="lg:flex lg:gap-2 w-full mt-2 lg:mt-0">
+          <div className='flex gap-1 lg:gap-2 lg:w-full'>
+            <button
+              onClick={handleOpenAddStock}
+              className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
+            >+ HASIL GILING</button>
+            <button
+              onClick={handleOpenReduceStock}
+              className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
+            >+ GILING</button>
+          </div>
+          <div className='flex gap-1 lg:gap-2 mt-2 lg:mt-0 lg:w-full'>
+            <button
+              onClick={handleOpenStockPurchase}
+              className={"bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
+            >+ PENJUALAN</button>
+            <button
+              onClick={handleOpenTransferStock}
+              className={"hidden lg:block bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
+            >PINDAH GUDANG</button>
+            <button
+              onClick={handleOpenTransferStock}
+              className={"block lg:hidden bg-blue-1 text-[#ffff] px-4 py-1 rounded-2xl font-semibold w-full"}
+            >PINDAH</button>
+          </div>
+        </div>
       </div>
 
       <Modal
@@ -295,9 +342,9 @@ const Produk = () => {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+        <Box className="text-center border rounded-lg p-5 w-[80%] lg:w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>TAMBAH HASIL GILING</h2>
-          <div className='grid grid-cols-1 gap-3'>
+          <div className='grid grid-cols-1 gap-2 lg:gap-3'>
             <div className='grid grid-cols-7 items-center text-left'>
               <label className='col-span-2'>Jenis Produk</label>
               <p className='col-span-1'>:</p>
@@ -339,7 +386,7 @@ const Produk = () => {
           </div>
 
           <button
-            className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
+            className={"bg-blue-1 text-[#ffff] px-7 py-2 mt-3 rounded-xl font-semibold m-auto"}
             onClick={handleAddStock}
           >TAMBAH</button>
         </Box>
@@ -352,7 +399,7 @@ const Produk = () => {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+        <Box className="text-center border rounded-lg p-5 w-[80%] lg:w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>TAMBAH DATA PENJUALAN</h2>
           <div className='grid grid-cols-1 gap-3'>
             <div className='grid grid-cols-7 items-center text-left'>
@@ -395,7 +442,7 @@ const Produk = () => {
             </div>
           </div>
           <button
-            className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
+            className={"bg-blue-1 text-[#ffff] px-7 py-2 mt-3 rounded-xl font-semibold m-auto"}
             onClick={handleAddStockPurchase}
           >TAMBAH</button>
         </Box>
@@ -408,7 +455,7 @@ const Produk = () => {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+        <Box className="text-center border rounded-lg p-5 w-[80%] lg:w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>PINDAH GUDANG</h2>
           <div className='grid grid-cols-1 gap-3'>
             <div className='grid grid-cols-7 items-center text-left'>
@@ -419,7 +466,7 @@ const Produk = () => {
                   const value = e.target.value
                   setDestinationWarehouse(value)
                 }}
-                className='col-span-4 border p-[2px] rounded-md' 
+                className='col-span-4 border p-[2px] rounded-md h-10' 
                 name="cars" id="cars">
                 <option value={1}>GD 1</option>
                 <option value={2}>GD 2</option>
@@ -433,7 +480,7 @@ const Produk = () => {
               <label className='col-span-2'>Jenis Produk</label>
               <p className='col-span-1'>:</p>
               <select
-                className='col-span-4 border p-[2px] rounded-md w-full'
+                className='col-span-4 border p-[2px] rounded-md w-full h-10'
                 name='material_type'
                 id='materials'
                 onChange={(e) => {
@@ -452,7 +499,7 @@ const Produk = () => {
               <label className='col-span-2'>Jumlah</label>
               <p className='col-span-1'>:</p>
               <input
-                className='border col-span-4 rounded-md'
+                className='border col-span-4 rounded-md h-10'
                 onChange={(e) => {
                   const value = e.target.value
                   setAmount(value)
@@ -461,7 +508,7 @@ const Produk = () => {
             </div>
           </div>
           <button
-            className={"bg-blue-1 text-[#ffff] px-4 py-1 mt-3 rounded-xl font-semibold m-auto"}
+            className={"bg-blue-1 text-[#ffff] px-7 py-2 mt-3 rounded-xl font-semibold m-auto"}
             onClick={handleMoveStock}
           >TAMBAH</button>
         </Box>
@@ -474,7 +521,7 @@ const Produk = () => {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+        <Box className="text-center border rounded-lg p-5 w-[80%] lg:w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>TAMBAH BAHAN UNTUK GILING</h2>
           <div className='flex gap-4 justify-beetween w-full'>
             <div className='text-left w-[50%]'>
@@ -507,7 +554,7 @@ const Produk = () => {
             </div>
           </div>
           <button
-            className={"bg-blue-1 text-[#ffff] px-6 py-2 mt-3 rounded-xl font-semibold m-auto"}
+            className={"bg-blue-1 text-[#ffff] px-7 py-2 mt-3 rounded-xl font-semibold m-auto"}
             onClick={handleReduceStock}
           >TAMBAH</button>
         </Box>
@@ -536,8 +583,8 @@ const Produk = () => {
         </Box>
       </Modal>
 
-      {/* BUTTON GROUP */}
-      <div className='border border-[#f4f4f4] flex gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
+      {/* SELECT WAREHOUSE */}
+      <div className='hidden border border-[#f4f4f4] lg:flex gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
         <ToggleButtonGroup
           color="primary"
           value={warehouse}
@@ -608,7 +655,7 @@ const Produk = () => {
         </ToggleButtonGroup>
       </div>
 
-      <div className="overflow-x-auto mt-5 mx-20 h-80 border border-1 rounded-xl">
+      <div className="overflow-x-auto mt-2 lg:mt-5 mx-5 lg:mx-20 h-80 border border-1 rounded-xl">
         <table className="text-[12px] table-auto overflow-auto border-collapse border border-gray-800 text-center w-full">
           <thead className="sticky top-0 bg-blue-1">
             <tr className="bg-blue-600 text-[white]">
@@ -621,43 +668,49 @@ const Produk = () => {
           </thead>          
           <tbody className='text-[#000000] border-[white]'>
             { role === "superadmin" ?
-              stocks.map((row, idx) => (
-                <tr key={idx} onContextMenu={(event) => handleRightClick(event, idx, row.id)} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
-                  <td>{idx + 1}</td>
-                  <td className='text-left'>
-                    {
-                      row.transaksi === "masuk" && row.deskripsi.slice(0, 2) === "GD" ? `PINDAH DARI ${row.deskripsi}`
-                      : row.transaksi === "masuk" ? "HASIL GILING"
-                      : row.transaksi === "jual" ? "STOK KELUAR"
-                      : row.transaksi === "giling" ? "STOK KELUAR"
-                      : row.transaksi === "pindah" ? "PINDAH"
-                      : row.deskripsi.toUpperCase()
-                    }
-                  </td>
-                  <td>{row.produk}</td>
-                  <td>{row.total}</td>
-                  <td>{row.deskripsi !== "" ? row.deskripsi.toUpperCase() : "-"}</td>
-                </tr>
-              ))
+              stocks.map((row, idx) => {
+                const bind = createEventHandlers(idx, row.id);
+                return (
+                  <tr key={idx} {...bind} onContextMenu={(event) => handleRightClick(event, idx, row.id)} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
+                    <td>{idx + 1}</td>
+                    <td className='text-left'>
+                      {
+                        row.transaksi === "masuk" && row.deskripsi.slice(0, 2) === "GD" ? `PINDAH DARI ${row.deskripsi}`
+                        : row.transaksi === "masuk" ? "HASIL GILING"
+                        : row.transaksi === "jual" ? "STOK KELUAR"
+                        : row.transaksi === "giling" ? "STOK KELUAR"
+                        : row.transaksi === "pindah" ? "PINDAH"
+                        : row.deskripsi.toUpperCase()
+                      }
+                    </td>
+                    <td>{row.produk}</td>
+                    <td>{row.total}</td>
+                    <td>{row.deskripsi !== "" ? row.deskripsi.toUpperCase() : "-"}</td>
+                  </tr>
+                )
+              })
               :
-              stocks.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{idx + 1}</td>
-                  <td className='text-left'>
-                    {
-                      row.transaksi === "masuk" && row.deskripsi.slice(0, 2) === "GD" ? `PINDAH DARI ${row.deskripsi}`
-                      : row.transaksi === "masuk" ? "HASIL GILING"
-                      : row.transaksi === "jual" ? "STOK KELUAR"
-                      : row.transaksi === "giling" ? "STOK KELUAR"
-                      : row.transaksi === "pindah" ? "PINDAH"
-                      : row.deskripsi.toUpperCase()
-                    }
-                  </td>
-                  <td>{row.produk}</td>
-                  <td>{row.total}</td>
-                  <td>{row.deskripsi !== "" ? row.deskripsi : "-"}</td>
-                </tr>
-              ))
+              stocks.map((row, idx) => {
+                const bind = createEventHandlers(idx, row.id);
+                return (
+                  <tr key={idx} {...bind} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
+                    <td>{idx + 1}</td>
+                    <td className='text-left'>
+                      {
+                        row.transaksi === "masuk" && row.deskripsi.slice(0, 2) === "GD" ? `PINDAH DARI ${row.deskripsi}`
+                        : row.transaksi === "masuk" ? "HASIL GILING"
+                        : row.transaksi === "jual" ? "STOK KELUAR"
+                        : row.transaksi === "giling" ? "STOK KELUAR"
+                        : row.transaksi === "pindah" ? "PINDAH"
+                        : row.deskripsi.toUpperCase()
+                      }
+                    </td>
+                    <td>{row.produk}</td>
+                    <td>{row.total}</td>
+                    <td>{row.deskripsi !== "" ? row.deskripsi : "-"}</td>
+                  </tr>
+                )
+              })
             }
             {
               Array.from({ length: Math.max(0, 10 - stocks.length) }).map((_, idx) => (
@@ -674,9 +727,9 @@ const Produk = () => {
         </table>
       </div>
 
-      <div className='border border-[#f4f4f4] px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
+      <div className='border border-[#f4f4f4] px-5 mx-5 lg:mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] my-5'>
         <p className='font-bold'>RINCIAN</p>
-        <div className='flex justify-between'>
+        <div className='lg:flex justify-between'>
           <div>
             <p className='font-bold'>TOTAL STOK</p>
             {
