@@ -873,6 +873,14 @@ const Home = () => {
                   }
                 </select>
               </div>
+              <div className='grid grid-cols-7 items-center mt-3'>
+                <label className='col-span-2 text-left'>Nopol</label>
+                <p className='col-span-1'>:</p>
+                <input
+                  className='col-span-4 border w-[150px] rounded-md'
+                  onChange={(e) => setPlateNumber(e.target.value)}
+                ></input>
+              </div>
               <div className='flex justify-between my-3'>
                 <label>Jenis Beras:</label>
                 <select
@@ -967,17 +975,17 @@ const Home = () => {
           aria-labelledby="child-modal-title"
           aria-describedby="child-modal-description"
         >
-          <Box className="text-center border rounded-lg p-5 w-[500px]" sx={{ ...style }}>
+          <Box className="text-center border rounded-lg p-5 w-[80%] lg:w-[500px]" sx={{ ...style }}>
             <h2 className='font-semibold text-center pb-3'>PINDAH GUDANG</h2>
-            <div className='flex gap-4'>
-              <div className='text-left w-[50%]'>
+            <div className='lg:flex lg:gap-4'>
+              <div className='text-left w-full pb-2 lg:pb-0 lg:w-[50%]'>
                 <label>Tujuan:</label>
                 <select 
                   onChange={(e) => {
                     const value = e.target.value
                     setDestinationWarehouse(value)
                   }}
-                  className='border p-[2px] w-full rounded-md' 
+                  className='border p-[2px] w-full rounded-md h-10' 
                   name="cars" id="cars">
                   <option value={1}>GD 1</option>
                   <option value={2}>GD 2</option>
@@ -987,10 +995,10 @@ const Home = () => {
                   <option value={6}>GD 6</option>
                 </select>
               </div>
-              <div className='text-left w-[50%]'>
+              <div className='text-left w-full pb-2 lg:pb-0 lg:w-[50%]'>
                 <label>Jenis Beras:</label>
                 <select
-                  className='border p-[2px] w-full rounded-md' name='material_type' id='materials'
+                  className='border p-[2px] w-full rounded-md h-10' name='material_type' id='materials'
                   onChange={(e) => {
                     const value = e.target.value
                     setMaterialType(value)
@@ -1002,10 +1010,10 @@ const Home = () => {
                   <option key={4} value={4}>Bramo</option>
                 </select>
               </div>
-              <div className='text-left w-[50%]'>
+              <div className='text-left w-full pb-2 lg:pb-0 lg:w-[50%]'>
                 <label>Jumlah:</label>
                 <input
-                  className='border w-full rounded-md'
+                  className='border w-full rounded-md h-10'
                   onChange={(e) => {
                     const value = e.target.value
                     setAmount(value)
