@@ -246,22 +246,32 @@ const Produk = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!warehouse || !startDate) return;
-  
-        const stock = await getStockProducts(warehouse, startDate);
-        setStocks(stock.data.data); 
-  
+        if (!startDate) return;
+
+        let targetWarehouse = warehouse;
+
+        if (role !== 'superadmin') {
+          const current = parseInt(currentWarehouse.slice(-1));
+          if (!warehouse || warehouse !== current) {
+            setWarehouse(current);
+            return;
+          }
+          targetWarehouse = current;
+        }
+
+        const stock = await getStockProducts(targetWarehouse, startDate);
+        setStocks(stock.data.data);
+
         const product = await getProducts();
-        setProducts(product.data.data); 
-  
-        const productReport = await getProductReports(warehouse, startDate);
-        setProductReports(productReport.data.data); 
-  
-      } catch (err) {
-        alert(err.message);
+        setProducts(product.data.data);
+
+        const productReport = await getProductReports(targetWarehouse, startDate);
+        setProductReports(productReport.data.data);
+      } catch (error) {
+        alert(error.message);
       }
     };
-  
+
     fetchData();
   }, [warehouse, startDate]);
   

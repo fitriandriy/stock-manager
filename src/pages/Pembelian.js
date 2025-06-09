@@ -11,7 +11,8 @@ const Pembelian = () => {
   const defaultYear = now.getFullYear();
   const defaultMonthString = now.toISOString().slice(0, 7);
 
-  const [date, setDate] = useState('');
+  const today = new Date().toISOString().split('T')[0];
+  const [date, setDate] = useState(today);
   const [materialType, setMaterialType] = useState(3);
   const [amount, setAmount] = useState('');
   const [openSuccess, setOpenSuccess] = useState(false);
@@ -114,7 +115,6 @@ const Pembelian = () => {
     handleClickOutside();
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       const [year, month] = selectedMonth.split("-").map(Number);
@@ -174,6 +174,7 @@ const Pembelian = () => {
             <div className='flex justify-between my-2'>
               <label>Jumlah:</label>
               <input
+                placeholder='Dalam kg'
                 type='number'
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -266,7 +267,7 @@ const Pembelian = () => {
               <td>TANGGAL</td>
               <td>SUPPLIER</td>
               <td>PRODUK</td>
-              <td>NOMINAL</td>
+              <td>NOMINAL (KG)</td>
             </tr>
           </thead>
           <tbody>

@@ -35,7 +35,6 @@ const Home = () => {
   const [stocks, setStocks] = React.useState([])
   const [suppliers, setSuppliers] = React.useState([])
   const [customers, setCustomers] = React.useState([])
-  const [error, setError] = React.useState("")
   const [dataId, setDataId] = React.useState()
   const token = localStorage.getItem("token")
   let editorId = null;
@@ -253,34 +252,34 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const stock = await getData(warehouse, date)
-        const supplier = await getSuppliers()
-        const customer = await getCustomers()
-        setStocks(stock.data.data); 
-        setSuppliers(supplier.data.data); 
+        if (!startDate) return;
+
+        let targetWarehouse = warehouse;
+
+        if (role !== 'superadmin') {
+          const current = parseInt(currentWarehouse.slice(-1));
+
+          if (!warehouse || warehouse !== current) {
+            setWarehouse(current);
+            return;
+          }
+
+          targetWarehouse = current;
+        }
+
+        const stock = await getData(targetWarehouse, date);
+        const supplier = await getSuppliers();
+        const customer = await getCustomers();
+
+        setStocks(stock.data.data);
+        setSuppliers(supplier.data.data);
         setCustomers(customer.data.data);
       } catch (err) {
-        setError(err.message); 
+        alert(err.message);
       }
     };
 
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getData(warehouse, date)
-        setStocks(response.data.data)
-      } catch (err) {
-        setError(err.message);
-        alert(error)
-      }
-    };
-
-    if (startDate && warehouse) {
-      fetchData();
-    }
   }, [startDate, warehouse]);
 
   if ( role === 'superadmin' ) {
