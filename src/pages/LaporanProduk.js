@@ -13,7 +13,7 @@ const LaporanProduk = () => {
     const fetchData = async () => {
       try {
         const response = await getProductStockReport(date)
-        setReports(response.data.data)
+        setReports(response.data.data.slice(2))
       } catch (err) {
         alert(err.message)
       }
@@ -43,7 +43,7 @@ const LaporanProduk = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto mt-5 mx-20 h-[400px] border border-1 rounded-xl">
+      <div className="overflow-x-auto mt-5 mx-20 h-[500px] mb-5 border border-1 rounded-xl">
         <table className="text-[14px] table-auto overflow-auto border-collapse border border-gray-800 text-center w-full">
           <thead className="sticky top-0 bg-blue-1">
             <tr className="bg-blue-600 text-[white]">
