@@ -51,8 +51,8 @@ const ProsesProduksi = () => {
         </div>
         <div className='flex justify-evenly mt-5 p-1 bg-[#e2e0e0] mx-44 rounded-lg'>
           <p className='font-bold'>STOK BAHAN :</p>
-          <p>IR 64 : {parseInt(reports[0]?.stock) * 50} KG</p>
-          <p>BRAMO : {parseInt(reports[1]?.stock) * 50} KG</p>
+          <p>IR 64 : {(parseInt(reports[0]?.stock) * 50).toLocaleString('id-ID')} KG</p>
+          <p>BRAMO : {(parseInt(reports[1]?.stock) * 50).toLocaleString('id-ID')} KG</p>
         </div>
         <div className='flex gap-5 justify-between mx-44 pt-5 mb-10'>
           <div>
@@ -319,6 +319,18 @@ const ProsesProduksi = () => {
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[9]?.keluar.jual}</td>
                   <td>sak: {reports[9]?.hasil_giling}</td>
+                </tr>
+                <tr>
+                  <td className='text-left'>BERAS MANGGA @ 5 KG</td>
+                  <td className='text-left'>STOK</td>
+                  <td>{reports[28]?.stock}</td>
+                  <td>{reports[28]?.hasil_giling * 5} KG</td>
+                </tr>
+                <tr>
+                  <td>{reports[28]?.stock * 5}</td>
+                  <td className='text-left'>KELUAR</td>
+                  <td>{reports[28]?.keluar.jual}</td>
+                  <td>sak: {reports[28]?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS LEBAH @ 25 KG</td>
