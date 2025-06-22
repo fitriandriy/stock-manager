@@ -31,6 +31,7 @@ const Produk = () => {
   };
   const [warehouse, setWarehouse] = React.useState(1);
   const [destinationWarehouse, setDestinationWarehouse] = React.useState(1);
+  const [keteranganGiling, setKeteranganGiling] = React.useState('');
   const [stocks, setStocks] = React.useState([])
   const [products, setProducts] = React.useState([])
   const [productReports, setProductReports] = React.useState([])
@@ -142,13 +143,14 @@ const Produk = () => {
     }
 
     try {
-      const response = await addReduceStock(warehouse, productName, amount, description, editorId, date);
+      const response = await addReduceStock(warehouse, productName, amount, keteranganGiling, editorId, date);
 
       if(response.data.status === true) {
         const newData = await getStockProducts(warehouse, date)
         setStocks(newData.data.data)
         handleClose();
         setOpenSuccess(true);
+        setKeteranganGiling("Giling untuk PS")
       }
     } catch (error) {
       alert("Error saat membuat stok:", error);
@@ -533,9 +535,10 @@ const Produk = () => {
       >
         <Box className="text-center border rounded-lg p-5 w-[80%] lg:w-[500px]" sx={{ ...style }}>
           <h2 className='font-semibold text-center pb-3'>TAMBAH BAHAN UNTUK GILING</h2>
-          <div className='flex gap-4 justify-beetween w-full'>
-            <div className='text-left w-[50%]'>
+          <div className='grid grid-cols-1 gap-3'>
+            <div className='grid grid-cols-7 items-center text-left'>
               <label className='col-span-2'>Jenis Produk</label>
+              <p className='col-span-1'>:</p>
               <select
                 className='col-span-4 border p-[6px] rounded-md w-full'
                 name='material_type'
@@ -552,15 +555,34 @@ const Produk = () => {
                 ))}
               </select>
             </div>
-            <div className='text-left w-[50%]'>
-              <label>Jumlah:</label>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Jumlah</label>
+              <p className='col-span-1'>:</p>
               <input
-                className='border w-full rounded-md p-[6px]'
+                className='col-span-4 border p-[6px] rounded-md w-full'
                 onChange={(e) => {
                   const value = e.target.value
                   setAmount(value)
                 }}
               ></input>
+            </div>
+            <div className='grid grid-cols-7 items-center text-left'>
+              <label className='col-span-2'>Keterangan</label>
+              <p className='col-span-1'>:</p>
+              <select
+                className='col-span-4 border p-[6px] rounded-md w-full'
+                name='keteranganGiling'
+                id='keteranganGiling'
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setKeteranganGiling(value);
+                }}
+              >
+                <option>Giling untuk PS</option>
+                <option>Giling untuk Kuning</option>
+                <option>Giling untuk Tepung</option>
+                <option>Giling untuk Lebah</option>
+              </select>
             </div>
           </div>
           <button

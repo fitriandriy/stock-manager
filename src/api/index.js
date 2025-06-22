@@ -184,7 +184,7 @@ export const addReduceStock = async (warehouse_id, product_id, total, descriptio
       product_id,
       product_transaction_id: 3,
       total,
-      description: "Giling untuk PS",
+      description: description,
       editor,
       createdAt
     }, {

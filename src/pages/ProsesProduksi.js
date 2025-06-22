@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const ProsesProduksi = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [reports, setReports] = useState([])
+  const [purchase, setPurchase] = useState('')
   const date = startDate.toLocaleDateString('en-CA')
 
   useEffect(() => {
@@ -14,6 +15,7 @@ const ProsesProduksi = () => {
       try {
         const response = await getProductionProcessReport(date)
         setReports(response.data.data)
+        setPurchase(response.data.pembelian)
       } catch (err) {
         alert(err.message)
       }
@@ -94,13 +96,13 @@ const ProsesProduksi = () => {
                   <td className='text-left'>BERAS PS @ 5 KG</td>
                   <td className='text-left'>STOK</td>
                   <td>{reports[4]?.stock}</td>
-                  <td>{reports[4]?.hasil_giling * 5} KG</td>
+                  <td>{reports[4]?.hasil_giling * 5} {purchase ? '- ' + purchase : ''} KG</td>
                 </tr>
                 <tr>
                   <td>{reports[4]?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
                   <td>{reports[4]?.keluar.jual}</td>
-                  <td>sak: {(reports[4]?.hasil_giling * 5)/5}</td>
+                  <td>sak: {(reports[4]?.hasil_giling * 5)/5} {purchase ? '- ' + (purchase / 5) : ''}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BROKEN @ 50 KG</td>
