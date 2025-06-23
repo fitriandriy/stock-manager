@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { getHasilProduksi } from '../api';
 import NavBar from "../components/NavBar";
 import "react-datepicker/dist/react-datepicker.css";
 
 const LaporanHasilProduksi = () => {
   const [hasilProduksi, setHasilProduksi] = React.useState();
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +20,12 @@ const LaporanHasilProduksi = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [hasilProduksi]);
 
   if (!hasilProduksi) {
     return (
@@ -70,6 +77,44 @@ const LaporanHasilProduksi = () => {
       totalHasilProduksiKg += produkData.total * produk.beratKemasan;
     }
   });
+
+  // Total presentase beras merk
+  const persentaseBeras = () => {
+    let persentaseBerasMerk = 0
+    persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)
+      ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * produkBerat.find(p => p.product_id === 5)?.beratKemasan) - Number(hasilProduksi.total_pembelian)) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100)
+      : 0
+    const index = [3,4,6,7,8,9,10,16,17,22,29]
+    index.forEach(i => {
+      persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === i)
+        ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === i).total * produkBerat.find(p => p.product_id === i)?.beratKemasan) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100)
+        : 0
+    });
+
+    return persentaseBerasMerk.toFixed(1)
+  }
+  const persentaseBerasPk = () => {
+    const ids = [26, 27, 28];
+    const beratKemasan = { 26: 25, 27: 10, 28: 5 };
+
+    const totalPersenGabung = ids.reduce((acc, id) => {
+      const produk = hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === id);
+      if (produk) {
+        acc += (produk.total * beratKemasan[id]);
+      }
+      return acc;
+    }, 0);
+
+    const denominator = totalHasilProduksiKg - hasilProduksi.total_pembelian - hasilProduksi.total_pindah_bahan;
+
+    return denominator > 0
+      ? ((totalPersenGabung - hasilProduksi.total_pindah_bahan) / denominator * 100).toFixed(1)
+      : '-';
+  }
+
+  const persentaseBerasMerk = persentaseBeras()
+  const persentaseBerasKuning = persentaseBerasPk()
+
   return (
     <div className='text-[#585858]'>
       <NavBar />
@@ -77,11 +122,30 @@ const LaporanHasilProduksi = () => {
         <p className=''>LAPORAN HASIL PRODUKSI</p>
       </div>
 
-      <div className='mx-20 my-5'>
-        <p className='font-bold'>SISA DI DALAM SILO: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian)).toLocaleString('id-ID')} kg</p>
+      <div className='mx-20 my-5 flex justify-between'>
+        <div>
+          <div className='flex'>
+            <p>PERSENTASE BERAS MERK</p>
+            <p className='font-bold'>: {persentaseBerasMerk} %</p>
+          </div>
+          <div className='flex'>
+            <p>PERSENTASE BERAS KUNING</p>
+            <p className='font-bold'>: {persentaseBerasKuning} %</p>
+          </div>
+        </div>
+        <div>
+          <div className='flex'>
+            <p>SISA DI DALAM SILO</p>
+            <p className='font-bold'>: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)).toLocaleString('id-ID')} kg</p>
+          </div>
+          <div className='flex'>
+            <p>TOTAL BAHAN LOST</p>
+            <p className='font-bold'>: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)).toLocaleString('id-ID')} kg</p>
+          </div>
+        </div>
       </div>
 
-      <div className="mx-20 overflow-auto border rounded-lg border-gray-300 h-[500px]">
+      <div ref={scrollRef} className="mx-20 overflow-auto border rounded-lg border-gray-300 h-[500px]">
         <table className="min-w-[1000px] border-collapse relative">
           <thead className='sticky top-0 bg-blue-1'>
             <tr className="bg-gray-100 text-[white]">
@@ -93,7 +157,7 @@ const LaporanHasilProduksi = () => {
               </th>
               <th key='3' className="sticky z-10 bg-gray-100 border w-full">PS25 HIJAU</th>
               <th key='4' className="sticky z-10 bg-gray-100 border w-full">PS10 HIJAU</th>
-              <th key='5' className="sticky z-10 bg-gray-100 border w-full">PS5 HIJAU</th>
+              <th key='5' className="sticky z-10 bg-gray-100 border w-full whitespace-nowrap">PS5 HIJAU</th>
               <th key='6' className="sticky z-10 bg-gray-100 border w-full">PS25 MERAH</th>
               <th key='7' className="sticky z-10 bg-gray-100 border w-full">PS10 MERAH</th>
               <th key='8' className="sticky z-10 bg-gray-100 border w-full">PS5 MERAH</th>
@@ -103,16 +167,16 @@ const LaporanHasilProduksi = () => {
               <th key='9' className="sticky z-10 bg-gray-100 border w-full">MANGGA 25KG</th>
               <th key='10' className="sticky z-10 bg-gray-100 border w-full">MANGGA 10KG</th>
               <th key='29' className="sticky z-10 bg-gray-100 border w-full">MANGGA 5KG</th>
+              <th key='16' className="sticky z-10 bg-gray-100 border w-full">LEBAH 25KG</th>
+              <th key='17' className="sticky z-10 bg-gray-100 border w-full">LEBAH 10KG</th>
+              <th key='23' className="sticky z-10 bg-gray-100 border w-full">POLOS</th>
               <th key='11' className="sticky z-10 bg-gray-100 border w-full">BROKEN PREMIUM</th>
               <th key='12' className="sticky z-10 bg-gray-100 border w-full">BRONIR PREMIUM</th>
               <th key='13' className="sticky z-10 bg-gray-100 border w-full">MENIR</th>
               <th key='14' className="sticky z-10 bg-gray-100 border w-full">EKONOMI</th>
               <th key='15' className="sticky z-10 bg-gray-100 border w-full">REJECT</th>
-              <th key='16' className="sticky z-10 bg-gray-100 border w-full">LEBAH 25KG</th>
-              <th key='17' className="sticky z-10 bg-gray-100 border w-full">LEBAH 10KG</th>
               <th key='21' className="sticky z-10 bg-gray-100 border w-full">KATUL</th>
               <th key='22' className="sticky z-10 bg-gray-100 border w-full">MENDANG</th>
-              <th key='23' className="sticky z-10 bg-gray-100 border w-full">POLOS</th>
               <th key='24' className="sticky z-10 bg-gray-100 border w-full">MURMER</th>
             </tr>
           </thead>
@@ -125,7 +189,7 @@ const LaporanHasilProduksi = () => {
                   <td>{(row.bahan_giling * 50).toLocaleString('id-ID')}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 3)?.total ? (row.hasil_produksi.find(item => item.product_id === 3)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 4)?.total ? (row.hasil_produksi.find(item => item.product_id === 4)?.total * 10).toLocaleString('id-ID') : "-"}</td>
-                  <td>{row.hasil_produksi.find(item => item.product_id === 5)?.total ? (row.hasil_produksi.find(item => item.product_id === 5)?.total * 5).toLocaleString('id-ID') : "-"}</td>
+                  <td className='w-full whitespace-nowrap'>{row.hasil_produksi.find(item => item.product_id === 5)?.total ? (row.hasil_produksi.find(item => item.product_id === 5)?.total * 5).toLocaleString('id-ID') : "-"} {row.pembelian ? '- ' + row.pembelian.toLocaleString('id-ID') : ""}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 6)?.total ? (row.hasil_produksi.find(item => item.product_id === 6)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 7)?.total ? (row.hasil_produksi.find(item => item.product_id === 7)?.total * 10).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 8)?.total ? (row.hasil_produksi.find(item => item.product_id === 8)?.total * 5).toLocaleString('id-ID') : "-"}</td>
@@ -135,16 +199,16 @@ const LaporanHasilProduksi = () => {
                   <td>{row.hasil_produksi.find(item => item.product_id === 9)?.total ? (row.hasil_produksi.find(item => item.product_id === 9)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 10)?.total ? (row.hasil_produksi.find(item => item.product_id === 10)?.total * 10).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 29)?.total ? (row.hasil_produksi.find(item => item.product_id === 29)?.total * 5).toLocaleString('id-ID') : "-"}</td>
+                  <td>{row.hasil_produksi.find(item => item.product_id === 16)?.total ? (row.hasil_produksi.find(item => item.product_id === 16)?.total * 25).toLocaleString('id-ID') : "-"}</td>
+                  <td>{row.hasil_produksi.find(item => item.product_id === 17)?.total ? (row.hasil_produksi.find(item => item.product_id === 17)?.total * 10).toLocaleString('id-ID') : "-"}</td>
+                  <td>{row.hasil_produksi.find(item => item.product_id === 22)?.total ? (row.hasil_produksi.find(item => item.product_id === 22)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 11)?.total ? (row.hasil_produksi.find(item => item.product_id === 11)?.total * 50).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 12)?.total ? (row.hasil_produksi.find(item => item.product_id === 12)?.total * 50).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 13)?.total ? (row.hasil_produksi.find(item => item.product_id === 13)?.total * 50).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 14)?.total ? (row.hasil_produksi.find(item => item.product_id === 14)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 15)?.total ? (row.hasil_produksi.find(item => item.product_id === 15)?.total * 50).toLocaleString('id-ID') : "-"}</td>
-                  <td>{row.hasil_produksi.find(item => item.product_id === 16)?.total ? (row.hasil_produksi.find(item => item.product_id === 16)?.total * 25).toLocaleString('id-ID') : "-"}</td>
-                  <td>{row.hasil_produksi.find(item => item.product_id === 17)?.total ? (row.hasil_produksi.find(item => item.product_id === 17)?.total * 10).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 24)?.total ? (row.hasil_produksi.find(item => item.product_id === 24)?.total * 1).toLocaleString('id-ID') : "-"}</td> {/* katul*/}
                   <td>{row.hasil_produksi.find(item => item.product_id === 25)?.total ? (row.hasil_produksi.find(item => item.product_id === 25)?.total * 1).toLocaleString('id-ID') : "-"}</td>
-                  <td>{row.hasil_produksi.find(item => item.product_id === 22)?.total ? (row.hasil_produksi.find(item => item.product_id === 22)?.total * 25).toLocaleString('id-ID') : "-"}</td>
                   <td>{row.hasil_produksi.find(item => item.product_id === 23)?.total ? (row.hasil_produksi.find(item => item.product_id === 23)?.total * 50).toLocaleString('id-ID') : "-"}</td>
                 </tr>
               ))
@@ -164,7 +228,7 @@ const LaporanHasilProduksi = () => {
               <td className="border p-2 text-center">{(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4)?.total * 10).toLocaleString('id-ID') : "-"}</td>
-              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)?.total * 5).toLocaleString('id-ID') : "-"}</td>
+              <td className='whitespace-nowrap'>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)?.total * 5).toLocaleString('id-ID') + "-" + Number(hasilProduksi.total_pembelian).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7)?.total * 10).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8)?.total * 5).toLocaleString('id-ID') : "-"}</td>
@@ -174,18 +238,17 @@ const LaporanHasilProduksi = () => {
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10)?.total * 10).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29)?.total * 5).toLocaleString('id-ID') : "-"}</td>
+              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)?.total * 25).toLocaleString('id-ID') : "-"}</td>
+              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)?.total * 10).toLocaleString('id-ID') : "-"}</td>
+              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11)?.total * 50).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12)?.total * 50).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13)?.total * 50).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15)?.total * 50).toLocaleString('id-ID') : "-"}</td>
-              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)?.total * 25).toLocaleString('id-ID') : "-"}</td>
-              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)?.total * 10).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24)?.total * 1).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25)?.total * 1).toLocaleString('id-ID') : "-"}</td>
-              <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)?.total * 25).toLocaleString('id-ID') : "-"}</td>
               <td>{hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23)?.total ? (hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23)?.total * 50).toLocaleString('id-ID') : "-"}</td>
-
             </tr>
             {/* presentase */}
             <tr className='sticky bottom-0 bg-[#d5d5d5] bg-white z-10 font-bold'>
@@ -194,161 +257,142 @@ const LaporanHasilProduksi = () => {
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)
-                    ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * 5) - Number(hasilProduksi.total_pembelian)) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * 5) - Number(hasilProduksi.total_pembelian)) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 26)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 26).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 27)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 27).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 28)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 28).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
+              {/* kuning */}
+              <td colSpan={3}>{persentaseBerasKuning} %</td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24).total * 1) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25).total * 1) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24).total * 1) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    : "-"
+                }
+              </td>
+              <td>
+                {
+                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25)
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25).total * 1) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
                     : "-"
                 }
               </td>
@@ -359,11 +403,12 @@ const LaporanHasilProduksi = () => {
 
       <div className='mx-20 my-5 flex justify-between'>
         <div className=''>
-          <p>SISA DALAM SILO (BAHAN GILING - (TOTAL HASIL PRODUKSI - TOTAL PEMBELIAN PRODUK))</p>
-          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ({totalHasilProduksiKg.toLocaleString('id-ID')} - {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')}) = {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian)).toLocaleString('id-ID')} kg</p>
+          <p>SISA DALAM SILO (BAHAN GILING - (TOTAL HASIL PRODUKSI - TOTAL PEMBELIAN PRODUK - TOTAL PINDAH BAHAN))</p>
+          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ({totalHasilProduksiKg.toLocaleString('id-ID')} - {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')} - {Number(hasilProduksi.total_pindah_bahan.toLocaleString('id-ID'))}) = {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)).toLocaleString('id-ID')} kg</p>
         </div>
         <div>
           <p>TOTAL PEMBELIAN: {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')}</p>
+          <p>TOTAL PINDAH BAHAN: {Number(hasilProduksi.total_pindah_bahan).toLocaleString('id-ID')}</p>
         </div>
       </div>
     </div>
