@@ -78,16 +78,19 @@ const LaporanHasilProduksi = () => {
     }
   });
 
+  const konstantaPembagi = totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah))
+
   // Total presentase beras merk
   const persentaseBeras = () => {
     let persentaseBerasMerk = 0
     persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)
-      ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * produkBerat.find(p => p.product_id === 5)?.beratKemasan) - Number(hasilProduksi.total_pembelian)) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100)
+      ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * produkBerat.find(p => p.product_id === 5)?.beratKemasan) - Number(hasilProduksi.total_pembelian)) / konstantaPembagi) * 100)
       : 0
     const index = [3,4,6,7,8,9,10,16,17,22,29]
     index.forEach(i => {
+      console.log(persentaseBerasMerk)
       persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === i)
-        ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === i).total * produkBerat.find(p => p.product_id === i)?.beratKemasan) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100)
+        ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === i).total * produkBerat.find(p => p.product_id === i)?.beratKemasan) / konstantaPembagi) * 100)
         : 0
     });
 
@@ -105,7 +108,7 @@ const LaporanHasilProduksi = () => {
       return acc;
     }, 0);
 
-    const denominator = totalHasilProduksiKg - hasilProduksi.total_pembelian - hasilProduksi.total_pindah_bahan;
+    const denominator = konstantaPembagi
 
     return denominator > 0
       ? ((totalPersenGabung - hasilProduksi.total_pindah_bahan) / denominator * 100).toFixed(1)
@@ -114,6 +117,15 @@ const LaporanHasilProduksi = () => {
 
   const persentaseBerasMerk = persentaseBeras()
   const persentaseBerasKuning = persentaseBerasPk()
+
+  const hasilProduksiPS25 = hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3) ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3).total * 25))) : 0
+  const hasilProduksiPS10 = hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4) ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4).total * 10))) : 0
+  const hasilProduksiPS5 = hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5) ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * 5) - Number(hasilProduksi.total_pembelian)))) : 0
+  const persentaseBerasPs = ((((hasilProduksiPS25 + hasilProduksiPS10 + hasilProduksiPS5) - Number(hasilProduksi.bahan_campuran_ps)) / konstantaPembagi) * 100).toFixed(2);
+
+  const hasilProduksiLebah25 = hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16) ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * 25))) : 0
+  const hasilProduksiLebah10 = hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17) ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17).total * 10))) : 0
+  const persentaseBerasLebah = ((((hasilProduksiLebah25 + hasilProduksiLebah10) - hasilProduksi.bahan_campuran_lebah) / konstantaPembagi) * 100).toFixed(2)
 
   return (
     <div className='text-[#585858]'>
@@ -136,11 +148,11 @@ const LaporanHasilProduksi = () => {
         <div>
           <div className='flex'>
             <p>SISA DI DALAM SILO</p>
-            <p className='font-bold'>: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)).toLocaleString('id-ID')} kg</p>
+            <p className='font-bold'>: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))).toLocaleString('id-ID')} kg</p>
           </div>
           <div className='flex'>
             <p>TOTAL BAHAN LOST</p>
-            <p className='font-bold'>: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)).toLocaleString('id-ID')} kg</p>
+            <p className='font-bold'>: {((((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))) / (hasilProduksi.total_bahan_giling * 50)) * 100).toLocaleString('id-ID')} %</p>
           </div>
         </div>
       </div>
@@ -254,45 +266,25 @@ const LaporanHasilProduksi = () => {
             <tr className='sticky bottom-0 bg-[#d5d5d5] bg-white z-10 font-bold'>
               <td className="left-0 border text-center bg-white z-20">PRESENTASE</td>
               <td className="border text-center"></td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 3).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 4).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)
-                    ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * 5) - Number(hasilProduksi.total_pembelian)) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
-                    : "-"
-                }
-              </td>
+              <td colSpan={3}>{persentaseBerasPs} %</td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 6).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 7).total * 10) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 8).total * 5) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
@@ -301,98 +293,100 @@ const LaporanHasilProduksi = () => {
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 9).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 10).total * 10) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29).total * 5) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 29).total * 5) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
-              <td>
+              {/* lebah */}
+              <td colSpan={2}>{persentaseBerasLebah} %</td>
+              {/* <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17).total * 10) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17).total * 10) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
-              </td>
+              </td> */}
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 11).total * 50) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 12).total * 50) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 13).total * 50) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15).total * 50) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 15).total * 50) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24).total * 1) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 24).total * 1) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25).total * 1) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 25).total * 1) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23).total * 25) / (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)) * 100).toFixed(1) + '%'
+                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 23).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
@@ -403,12 +397,17 @@ const LaporanHasilProduksi = () => {
 
       <div className='mx-20 my-5 flex justify-between'>
         <div className=''>
-          <p>SISA DALAM SILO (BAHAN GILING - (TOTAL HASIL PRODUKSI - TOTAL PEMBELIAN PRODUK - TOTAL PINDAH BAHAN))</p>
-          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ({totalHasilProduksiKg.toLocaleString('id-ID')} - {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')} - {Number(hasilProduksi.total_pindah_bahan.toLocaleString('id-ID'))}) = {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg-hasilProduksi.total_pembelian-hasilProduksi.total_pindah_bahan)).toLocaleString('id-ID')} kg</p>
+          <p>SISA DALAM SILO (BAHAN GILING - (TOTAL HASIL PRODUKSI - TOTAL BAHAN CAMPURAN))</p>
+          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ( {Number(totalHasilProduksiKg).toLocaleString('id-ID')} - {(Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)).toLocaleString('id-ID')})</p>
+          <p>= {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))).toLocaleString('id-ID')} KG</p>
         </div>
         <div>
           <p>TOTAL PEMBELIAN: {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')}</p>
           <p>TOTAL PINDAH BAHAN: {Number(hasilProduksi.total_pindah_bahan).toLocaleString('id-ID')}</p>
+          <p>BAHAN CAMPURAN PS: {Number(hasilProduksi.bahan_campuran_ps).toLocaleString('id-ID')}</p>
+          <p>BAHAN CAMPURAN LEBAH: {Number(hasilProduksi.bahan_campuran_lebah).toLocaleString('id-ID')}</p>
+          <p>___________________________________ +</p>
+          <p className='font-bold'>TOTAL: {(Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)).toLocaleString('id-ID')}</p>
         </div>
       </div>
     </div>
