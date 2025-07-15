@@ -15,6 +15,7 @@ const NavBar = () => {
   const [anchorElBahan, setAnchorElBahan] = React.useState(null);
   const [anchorElProduk, setAnchorElProduk] = React.useState(null);
   const [anchorElLaporan, setAnchorElLaporan] = React.useState(null);
+  const [anchorElRetur, setAnchorElRetur] = React.useState(null);
 
   const token = localStorage.getItem("token");
   let role = "";
@@ -101,6 +102,30 @@ const NavBar = () => {
                     <MenuItem onClick={() => navigate("/laporan-produk")}>Stok Produk</MenuItem>
                   </Menu>
                 </div>
+
+                {/* RETUR */}
+                {/* <div>
+                  <p
+                    className={`cursor-pointer ${
+                      ["/retur"].includes(location.pathname)
+                        ? "underline text-blue-600"
+                        : ""
+                    }`}
+                    onClick={handleClick(setAnchorElRetur)}
+                  >
+                    RETUR
+                  </p>
+                  <Menu
+                    className="mt-8"
+                    anchorEl={anchorElRetur}
+                    open={Boolean(anchorElRetur)}
+                    onClose={handleClose(setAnchorElRetur)}
+                    anchorOrigin={{ vertical: "top", horizontal: "left" }}
+                    transformOrigin={{ vertical: "top", horizontal: "left" }}
+                  >
+                    <MenuItem onClick={() => navigate("/retur")}>Input Data</MenuItem>
+                  </Menu>
+                </div> */}
 
                 {/* LAPORAN */}
                 <div>

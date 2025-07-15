@@ -351,3 +351,17 @@ export const deletePurchaseData = async (id) => {
     alert(error)
   }
 }
+
+export const getReturData = async(date) => {
+  const token = localStorage.getItem("token")
+  try {
+    const response = await axios.get(`${ENDPOINT}/retur/${date}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response
+  } catch (error) {
+    alert(error)
+  }
+}
