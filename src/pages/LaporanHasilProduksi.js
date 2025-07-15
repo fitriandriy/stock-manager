@@ -84,9 +84,14 @@ const LaporanHasilProduksi = () => {
   const persentaseBeras = () => {
     let persentaseBerasMerk = 0
     persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5)
-      ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * produkBerat.find(p => p.product_id === 5)?.beratKemasan) - Number(hasilProduksi.total_pembelian)) / konstantaPembagi) * 100)
+      ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 5).total * produkBerat.find(p => p.product_id === 5)?.beratKemasan) - Number(hasilProduksi.total_pembelian) - Number(hasilProduksi.bahan_campuran_ps)) / konstantaPembagi) * 100)
       : 0
-    const index = [3,4,6,7,8,9,10,16,17,22,29]
+    
+    persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)
+      ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * produkBerat.find(p => p.product_id === 16)?.beratKemasan) - Number(hasilProduksi.bahan_campuran_lebah)) / konstantaPembagi) * 100)
+      : 0
+
+    const index = [3,4,6,7,8,9,10,17,22,29]
     index.forEach(i => {
       console.log(persentaseBerasMerk)
       persentaseBerasMerk += hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === i)
@@ -96,6 +101,7 @@ const LaporanHasilProduksi = () => {
 
     return persentaseBerasMerk.toFixed(1)
   }
+
   const persentaseBerasPk = () => {
     const ids = [26, 27, 28];
     const beratKemasan = { 26: 25, 27: 10, 28: 5 };
@@ -313,20 +319,6 @@ const LaporanHasilProduksi = () => {
               </td>
               {/* lebah */}
               <td colSpan={2}>{persentaseBerasLebah} %</td>
-              {/* <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 16).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
-                    : "-"
-                }
-              </td>
-              <td>
-                {
-                  hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 17).total * 10) / konstantaPembagi) * 100).toFixed(2) + '%'
-                    : "-"
-                }
-              </td> */}
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 22)

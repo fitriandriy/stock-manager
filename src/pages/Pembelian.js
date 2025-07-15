@@ -18,8 +18,10 @@ const Pembelian = () => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [totalPurchase, setTotalPurchase] = useState(0);
+  const [totalPurchaseKetan, setTotalPurchaseKetan] = useState(0);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [openAddStock, setOpenAddStock] = useState(false);
+  const [supplierId, setSupplierId] = useState(1)
   const [selectedMonth, setSelectedMonth] = useState(defaultMonthString);
   const [month, setMonth] = useState(defaultMonth);
   const [startDate, setStartDate] = useState(now);
@@ -60,12 +62,13 @@ const Pembelian = () => {
     }
 
     try {
-      const response = await addCikIraPurchases(date, 1, Number(materialType), parsedAmount);
+      const response = await addCikIraPurchases(date, supplierId, Number(materialType), parsedAmount);
       if (response.data.status === true) {
         const [year, month] = selectedMonth.split("-").map(Number);
         const newData = await getPurchases(month, year);
         setReports(newData.data.data.data);
-        setTotalPurchase(newData.data.data.total)
+        setTotalPurchase(newData.data.data.totalPS5)
+        setTotalPurchaseKetan(newData.data.data.totalKetan)
         handleClose();
         setOpenSuccess(true);
       } else {
@@ -105,7 +108,8 @@ const Pembelian = () => {
       if(response.data.status === true) {
         const newData = await getPurchases(month, year)
         setReports(newData.data.data.data)
-        setTotalPurchase(newData.data.data.total)
+        setTotalPurchase(newData.data.data.totalPS5)
+        setTotalPurchaseKetan(newData.data.data.totalKetan)
         handleClose();
         setDeleteSuccess(true);
       }
@@ -121,7 +125,8 @@ const Pembelian = () => {
       try {
         const response = await getPurchases(month, year);
         setReports(response.data.data.data);
-        setTotalPurchase(response.data.data.total)
+        setTotalPurchase(response.data.data.totalPS5)
+        setTotalPurchaseKetan(response.data.data.totalKetan)
       } catch (err) {
         alert(err.message);
       }
@@ -154,6 +159,17 @@ const Pembelian = () => {
               />
             </div>
             <div className='flex justify-between my-2'>
+              <label>Supplier:</label>
+              <select
+                value={supplierId}
+                onChange={(e) => setSupplierId(e.target.value)}
+                className='border p-[4px] w-[250px] rounded-md'
+              >
+                <option value={1}>IRAWATI</option>
+                <option value={3}>BULOG KOM</option>
+              </select>
+            </div>
+            <div className='flex justify-between my-2'>
               <label>Jenis Beras:</label>
               <select
                 value={materialType}
@@ -169,6 +185,7 @@ const Pembelian = () => {
                 <option value={26}>BERAS PS KUNING @ 25 KG</option>
                 <option value={27}>BERAS PS KUNING @ 10 KG</option>
                 <option value={28}>BERAS PS KUNING @ 5 KG</option>
+                <option value={30}>KETAN PUTIH</option>
               </select>
             </div>
             <div className='flex justify-between my-2'>
@@ -256,7 +273,8 @@ const Pembelian = () => {
       </div>
 
       <div className='mx-44 mt-2'>
-        <p>Total pembelian saat ini: {Number(totalPurchase).toLocaleString('id-ID')} kg</p>
+        <p>Total pembelian PS5: {Number(totalPurchase).toLocaleString('id-ID')} kg</p>
+        <p>Total pembelian Ketan: {Number(totalPurchaseKetan).toLocaleString('id-ID')} kg</p>
       </div>
 
       <div className='overflow-x-auto mt-2 h-90 border border-1 rounded-xl mx-44 text-[14px]'>
