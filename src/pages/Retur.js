@@ -1,15 +1,67 @@
-import { useState, useEffect } from 'react'
-import { getProductionProcessReport, getReturData } from '../api';
+import React, { useState, useEffect } from 'react'
+import { addReturData, getProductionProcessReport, getReturData } from '../api';
 import DatePicker from "react-datepicker";
 import NavBar from "../components/NavBar";
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import "react-datepicker/dist/react-datepicker.css";
 
 const ReturData = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [reports, setReports] = useState([])
-  const [purchase, setPurchase] = useState('')
   const [retur, setRetur] = useState([])
+  const [formData, setFormData] = useState([
+    { product_id: 3, stock: '', stock_description: '', items_out: '', items_out_description: '' },  // ps25
+    { product_id: 4, stock: '', stock_description: '', items_out: '', items_out_description: '' },  // ps10
+    { product_id: 5, stock: '', stock_description: '', items_out: '', items_out_description: '' },  // ps5
+    { product_id: 6, stock: '', stock_description: '', items_out: '', items_out_description: '' },  // prem25
+    { product_id: 7, stock: '', stock_description: '', items_out: '', items_out_description: '' },  // prem10
+    { product_id: 8, stock: '', stock_description: '', items_out: '', items_out_description: '' },  // prem5
+    { product_id: 11, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // bpre
+    { product_id: 12, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // mkp
+    { product_id: 14, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // eko
+    { product_id: 20, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // tepung
+    { product_id: 26, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // pk25
+    { product_id: 27, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // pk10
+    { product_id: 28, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // pk5
+    { product_id: 31, stock: '', stock_description: '', items_out: '', items_out_description: '' }, // ketan ps 25
+  ]);
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    bgcolor: 'background.paper',
+    boxShadow: 24
+  };
+
+  const handleInputChange = (product_id, field, value) => {
+    setRetur(prevData =>
+      prevData.map(item =>
+        item.product_id === product_id
+          ? { ...item, [field]: value }
+          : item
+      )
+    );
+  };
+
+  const handleClose = () => {
+    setOpenSuccess(false);
+  };
+
   const date = startDate.toLocaleDateString('en-CA')
+
+  const handleSubmit = async () => {
+    try {
+      const res = await addReturData(date, retur)
+      setOpenSuccess(true);
+      const newretur = await getReturData(date)
+      setRetur(newretur.data.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,9 +69,20 @@ const ReturData = () => {
         const response = await getProductionProcessReport(date)
         setReports(response.data.data)
 
-        // const retur = await getReturData(date)
-        // setRetur(retur.data.data)
-        setPurchase(response.data.pembelian)
+        const retur = await getReturData(date)
+        setRetur(retur.data.data)
+
+        const mappedFormData = formData.map(item => {
+          const matchedRetur = retur.data.data.find(r => r.product_id === item.product_id);
+          return matchedRetur ? {
+            ...item,
+            stock: matchedRetur.stock || '',
+            stock_description: matchedRetur.stock_description || '',
+            items_out: matchedRetur.items_out || '',
+            items_out_description: matchedRetur.items_out_description || ''
+          } : item;
+        });
+        setFormData(mappedFormData);
       } catch (err) {
         alert(err.message)
       }
@@ -30,7 +93,7 @@ const ReturData = () => {
     }
   }, [startDate, date])
 
-  if (!reports) {
+  if (!reports || !retur) {
     return (
       <div className='text-[#585858]'>
         <NavBar />
@@ -43,8 +106,10 @@ const ReturData = () => {
     return (
       <div className='text-[#585858]'>
         <NavBar />
-        <div className='flex items-center justify-between gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#a1acff]'>
+        <div className='flex items-center justify-between gap-2 px-5 mx-80 rounded-2xl p-1 shadow-md shadow-[#a1acff]'>
           <p className=''>LAPORAN PROSES PRODUKSI DAN DATA RETUR</p>
+        </div>
+        <div className='flex justify-between mx-80 pt-5'>
           <div className='flex gap-2 py-1 px-10 rounded-2xl bg-blue-1'>
             <img className='w-5 h-5 mt-[3px]' src="./assets/date.png" alt='date-icon'></img>
             <DatePicker
@@ -54,524 +119,96 @@ const ReturData = () => {
               dateFormat="d-MM-yyyy"
             />
           </div>
+          <button
+            className="flex gap-2 py-1 px-10 rounded-2xl bg-blue-1 text-[white] font-semibold"
+            onClick={() => handleSubmit()}
+          >SIMPAN PERUBAHAN</button>
         </div>
-        <div className='flex justify-evenly mt-5 p-1 bg-[#e2e0e0] mx-20 rounded-lg'>
-          <p className='font-bold'>STOK BAHAN :</p>
-          <p>IR 64 : {(parseInt(reports[0]?.stock) * 50).toLocaleString('id-ID')} KG</p>
-          <p>BRAMO : {(parseInt(reports[1]?.stock) * 50).toLocaleString('id-ID')} KG</p>
-        </div>
-        <div className='flex gap-5 justify-between lg:px-20 pt-5 mb-10'>
-          <div>
-            <table className='rounded-lg'>
-              <thead className='bg-[#29c631] text-[white]'>
-                <tr>
-                  <th>PRODUK</th>
-                  <th></th>
-                  <th>NOMINAL</th>
-                  <th>HP</th>
-                  <th className='w-20'>RETUR</th>
-                  <th>KETERANGAN</th>
-                </tr>
-              </thead>
-              <tbody className='text-[12px]'>
-                <tr>
-                  <td className='text-left'>BERAS PS @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[2]?.stock}</td>
-                  <td>{reports[2]?.hasil_giling * 25} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[2]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[2]?.keluar.jual}</td>
-                  <td>sak: {(reports[2]?.hasil_giling * 25)/25}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PS @ 10 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[3]?.stock}</td>
-                  <td>{reports[3]?.hasil_giling * 10} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[3]?.stock * 10}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[3]?.keluar.jual}</td>
-                  <td>sak: {(reports[3]?.hasil_giling * 10)/10}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PS @ 5 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[4]?.stock}</td>
-                  <td>{reports[4]?.hasil_giling * 5} {purchase ? '- ' + purchase : ''} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[4]?.stock * 5}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[4]?.keluar.jual}</td>
-                  <td>sak: {(reports[4]?.hasil_giling * 5)/5} {purchase ? '- ' + (purchase / 5) : ''}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BROKEN @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[17]?.stock}</td>
-                  <td>{reports[17]?.hasil_giling * 50} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[17]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[17]?.keluar.jual}</td>
-                  <td></td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>MENIR KIBI @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[18]?.stock}</td>
-                  <td>{reports[18]?.hasil_giling * 50} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[18]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[18]?.keluar.jual} + {reports[18]?.keluar.giling}</td>
-                  <td></td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>MENIR @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[12]?.stock}</td>
-                  <td>{reports[12]?.hasil_giling * 50} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[12]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[12]?.keluar.jual} + {reports[12]?.keluar.giling}</td>
-                  <td></td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>TEPUNG @ 10 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[19]?.stock}</td>
-                  <td>{reports[19]?.hasil_giling * 10} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[19]?.stock * 10}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[19]?.keluar.jual}</td>
-                  <td>roll: {((reports[19]?.hasil_giling * 10)/1500).toFixed(1)}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>TAPIOKA @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[20]?.stock}</td>
-                  <td>{reports[20]?.hasil_giling * 50} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[20]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[20]?.keluar.jual} + {reports[20]?.keluar.giling}</td>
-                  <td></td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>KIBI POLOS @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[21]?.stock}</td>
-                  <td>{reports[21]?.hasil_giling * 25} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[21]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[21]?.keluar.jual}</td>
-                  <td>sak: {(reports[21]?.hasil_giling * 25)/25}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS REJECT @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[14]?.stock}</td>
-                  <td>{reports[14]?.hasil_giling * 50} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[14]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[14]?.keluar.jual} + {reports[14]?.keluar.giling}</td>
-                  <td></td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS MURMER @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[22]?.stock}</td>
-                  <td>{reports[22]?.hasil_giling * 25} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[22]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[22]?.keluar.jual}</td>
-                  <td></td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PS KUNING @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[25]?.stock}</td>
-                  <td>{reports[25]?.hasil_giling * 25} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[25]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[25]?.keluar.jual}</td>
-                  <td>sak: {reports[25]?.hasil_giling}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PS KUNING @ 10 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[26]?.stock}</td>
-                  <td>{reports[26]?.hasil_giling * 10} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[26]?.stock * 10}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[26]?.keluar.jual}</td>
-                  <td>sak: {reports[26]?.hasil_giling}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PS KUNING @ 5 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[27]?.stock}</td>
-                  <td>{reports[27]?.hasil_giling * 5} KG</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{reports[27]?.stock * 5}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[27]?.keluar.jual}</td>
-                  <td>sak: {reports[27]?.hasil_giling}</td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                  <td>
-                    <input class='w-full h-6'></input>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <table className='rounded-xl'>
-              <thead className='bg-[#c62929] text-[white] rounded-xl'>
-                <tr>
-                  <th>PRODUK</th>
-                  <th></th>
-                  <th>NOMINAL</th>
-                  <th>HASIL PRODUKSI (KG)</th>
-                </tr>
-              </thead>
-              <tbody className='text-[12px]'>
+        <div className='overflow-x-auto mt-2 h-[500px] mx-80 border border-1 rounded-xl text-[14px] mb-10'>
+          <table className='table-auto overflow-auto border-collapse'>
+            <thead className='sticky top-0 bg-blue-1 text-[white] font-semibold'>
               <tr>
-                  <td className='text-left'>BAHAN BAKU IR 64</td>
-                  <td></td>
-                  <td>{reports[0]?.keluar.giling * 50} KG</td>
-                  <td>{}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BAHAN BAKU MEMBRAMO</td>
-                  <td></td>
-                  <td>{reports[1]?.keluar.giling * 50} KG</td>
-                  <td>{}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PRE @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[5]?.stock}</td>
-                  <td>{reports[5]?.hasil_giling * 25} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[5]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[5]?.keluar.jual}</td>
-                  <td>sak: {reports[5]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PRE @ 10 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[6]?.stock}</td>
-                  <td>{reports[6]?.hasil_giling * 10} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[6]?.stock * 10}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[6]?.keluar.jual}</td>
-                  <td>sak: {reports[6]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS PRE @ 5 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[7]?.stock}</td>
-                  <td>{reports[7]?.hasil_giling * 5} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[7]?.stock * 5}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[7]?.keluar.jual}</td>
-                  <td>sak: {reports[7]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS MANGGA @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[8]?.stock}</td>
-                  <td>{reports[8]?.hasil_giling * 25} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[8]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[8]?.keluar.jual}</td>
-                  <td>sak: {reports[8]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS MANGGA @ 10 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[9]?.stock}</td>
-                  <td>{reports[9]?.hasil_giling * 10} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[9]?.stock * 10}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[9]?.keluar.jual}</td>
-                  <td>sak: {reports[9]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS MANGGA @ 5 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[28]?.stock}</td>
-                  <td>{reports[28]?.hasil_giling * 5} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[28]?.stock * 5}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[28]?.keluar.jual}</td>
-                  <td>sak: {reports[28]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS LEBAH @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[15]?.stock}</td>
-                  <td>{reports[15]?.hasil_giling * 25} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[15]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[15]?.keluar.jual}</td>
-                  <td>sak: {reports[15]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS LEBAH @ 10 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[16]?.stock}</td>
-                  <td>{reports[16]?.hasil_giling * 10} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[16]?.stock * 10}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[16]?.keluar.jual}</td>
-                  <td>sak: {reports[16]?.hasil_giling}</td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BROKEN PREMIUM @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[10]?.stock}</td>
-                  <td>{reports[10]?.hasil_giling * 50} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[10]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[10]?.keluar.jual} + {reports[10]?.keluar.giling}</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className='text-left'>MENIR KIBI PREM @ 50 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[11]?.stock}</td>
-                  <td>{reports[11]?.hasil_giling * 50} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[11]?.stock * 50}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[11]?.keluar.jual} + {reports[11]?.keluar.giling}</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className='text-left'>BERAS EKONOMI @ 25 KG</td>
-                  <td className='text-left'>STOK</td>
-                  <td>{reports[13]?.stock}</td>
-                  <td>{reports[13]?.hasil_giling * 25} KG</td>
-                </tr>
-                <tr>
-                  <td>{reports[13]?.stock * 25}</td>
-                  <td className='text-left'>KELUAR</td>
-                  <td>{reports[13]?.keluar.jual} + {reports[13]?.keluar.giling}</td>
-                  <td>sak: {reports[13]?.hasil_giling}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                <th>PRODUK</th>
+                <th></th>
+                <th>NOMINAL</th>
+                <th className='px-7'>HP</th>
+                <th className='w-10'></th>
+                <th>KETERANGAN</th>
+              </tr>
+            </thead>
+            {[
+              { id: 3, name: 'BERAS PS @ 25 KG', kg: 25 },
+              { id: 4, name: 'BERAS PS @ 10 KG', kg: 10 },
+              { id: 5, name: 'BERAS PS @ 5 KG', kg: 5 },
+              { id: 6, name: 'PREMIUM @ 25 KG', kg: 25 },
+              { id: 7, name: 'PREMIUM @ 10 KG', kg: 10 },
+              { id: 8, name: 'PREMIUM @ 5 KG', kg: 5 },
+              { id: 11, name: 'BERAS BP @ 50 KG', kg: 50 },
+              { id: 12, name: 'MKP @ 50 KG', kg: 50 },
+              { id: 14, name: 'BERAS EKO @ 25 KG', kg: 25 },
+              { id: 20, name: 'TEPUNG @ 10 KG', kg: 10 },
+              { id: 26, name: 'PK @ 25 KG', kg: 25 },
+              { id: 27, name: 'PK @ 10 KG', kg: 10 },
+              { id: 28, name: 'PK @ 5 KG', kg: 5 },
+              { id: 31, name: 'KETAN PS @ 25 KG', kg: 25 },
+            ].map((item, index) => {
+              const reportIndex = item.id - 1;
+              const report = reports[reportIndex];
+              const data = retur.find(d => d.product_id === item.id) || {};
+              return (
+                <React.Fragment key={item.id}>
+                  <tr className='text-[12px]'>
+                    <td className="text-left">{item.name}</td>
+                    <td className="text-left">STOK</td>
+                    <td>{report?.stock}</td>
+                    <td>{report?.hasil_giling * item.kg} KG</td>
+                    <td>
+                      <input
+                        value={data.stock || ''}
+                        onChange={(e) => handleInputChange(item.id, 'stock', e.target.value)}
+                        className="w-full h-6 text-center"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        value={data.stock_description || ''}
+                        onChange={(e) => handleInputChange(item.id, 'stock_description', e.target.value)}
+                        className="w-full h-6 text-center"
+                      />
+                    </td>
+                  </tr>
+                  <tr className='text-[12px]'>
+                    <td>{report?.stock * item.kg}</td>
+                    <td className="text-left">KELUAR</td>
+                    <td>{report?.keluar?.jual}{report?.keluar?.giling ? ` + ${report?.keluar.giling}` : ''}</td>
+                    <td>sak: {(report?.hasil_giling * item.kg) / item.kg}</td>
+                    <td>
+                      <input
+                        value={data.items_out || ''}
+                        onChange={(e) => handleInputChange(item.id, 'items_out', e.target.value)}
+                        className="w-full h-6 text-center"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        value={data.items_out_description || ''}
+                        onChange={(e) => handleInputChange(item.id, 'items_out_description', e.target.value)}
+                        className="w-full h-6 text-center"
+                      />
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
+          </table>
         </div>
+
+        <Modal open={openSuccess} onClose={handleClose}>
+          <Box className="text-center rounded-xl shadow-lg p-5 w-[250px]" sx={{ ...style }}>
+            <img className='w-[40px] m-auto pb-4' src='./assets/success.png' alt='' />
+            <p className='text-[12px] font-bold text-[#666666]'>DATA BERHASIL DITAMBAH</p>
+          </Box>
+        </Modal>
       </div>
     )
   }

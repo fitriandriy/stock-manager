@@ -104,7 +104,7 @@ const NavBar = () => {
                 </div>
 
                 {/* RETUR */}
-                {/* <div>
+                <div>
                   <p
                     className={`cursor-pointer ${
                       ["/retur"].includes(location.pathname)
@@ -125,7 +125,7 @@ const NavBar = () => {
                   >
                     <MenuItem onClick={() => navigate("/retur")}>Input Data</MenuItem>
                   </Menu>
-                </div> */}
+                </div>
 
                 {/* LAPORAN */}
                 <div>

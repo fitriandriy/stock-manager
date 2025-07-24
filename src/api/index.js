@@ -365,3 +365,19 @@ export const getReturData = async(date) => {
     alert(error)
   }
 }
+
+export const addReturData = async(date, data) => {
+  try {
+    const response = await axios.put(`${ENDPOINT}/retur`, {
+      date,
+      data
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response
+  } catch (error) {
+    console.log(error)
+  }
+}
