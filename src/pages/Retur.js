@@ -157,46 +157,48 @@ const ReturData = () => {
               const data = retur.find(d => d.product_id === item.id) || {};
               return (
                 <React.Fragment key={item.id}>
-                  <tr className='text-[12px]'>
-                    <td className="text-left">{item.name}</td>
-                    <td className="text-left">STOK</td>
-                    <td>{report?.stock}</td>
-                    <td>{report?.hasil_giling * item.kg} KG</td>
-                    <td>
-                      <input
-                        value={data.stock || ''}
-                        onChange={(e) => handleInputChange(item.id, 'stock', e.target.value)}
-                        className="w-full h-6 text-center"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        value={data.stock_description || ''}
-                        onChange={(e) => handleInputChange(item.id, 'stock_description', e.target.value)}
-                        className="w-full h-6 text-center"
-                      />
-                    </td>
-                  </tr>
-                  <tr className='text-[12px]'>
-                    <td>{report?.stock * item.kg}</td>
-                    <td className="text-left">KELUAR</td>
-                    <td>{report?.keluar?.jual}{report?.keluar?.giling ? ` + ${report?.keluar.giling}` : ''}</td>
-                    <td>sak: {(report?.hasil_giling * item.kg) / item.kg}</td>
-                    <td>
-                      <input
-                        value={data.items_out || ''}
-                        onChange={(e) => handleInputChange(item.id, 'items_out', e.target.value)}
-                        className="w-full h-6 text-center"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        value={data.items_out_description || ''}
-                        onChange={(e) => handleInputChange(item.id, 'items_out_description', e.target.value)}
-                        className="w-full h-6 text-center"
-                      />
-                    </td>
-                  </tr>
+                  <tbody>
+                    <tr className='text-[12px]'>
+                      <td className="text-left">{item.name}</td>
+                      <td className="text-left">STOK</td>
+                      <td>{report?.stock}</td>
+                      <td>{report?.hasil_giling * item.kg} KG</td>
+                      <td>
+                        <input
+                          value={data.stock || ''}
+                          onChange={(e) => handleInputChange(item.id, 'stock', e.target.value)}
+                          className="w-full h-6 text-center"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          value={data.stock_description || ''}
+                          onChange={(e) => handleInputChange(item.id, 'stock_description', e.target.value)}
+                          className="w-full h-6 text-center"
+                        />
+                      </td>
+                    </tr>
+                    <tr className='text-[12px]'>
+                      <td>{report?.stock * item.kg}</td>
+                      <td className="text-left">KELUAR</td>
+                      <td>{report?.keluar?.jual}{report?.keluar?.giling ? ` + ${report?.keluar.giling}` : ''}</td>
+                      <td>sak: {(report?.hasil_giling * item.kg) / item.kg}</td>
+                      <td>
+                        <input
+                          value={data.items_out || ''}
+                          onChange={(e) => handleInputChange(item.id, 'items_out', e.target.value)}
+                          className="w-full h-6 text-center"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          value={data.items_out_description || ''}
+                          onChange={(e) => handleInputChange(item.id, 'items_out_description', e.target.value)}
+                          className="w-full h-6 text-center"
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
                 </React.Fragment>
               );
             })}

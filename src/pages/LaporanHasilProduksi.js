@@ -78,7 +78,7 @@ const LaporanHasilProduksi = () => {
     }
   });
 
-  const konstantaPembagi = totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah))
+  const konstantaPembagi = totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah) + Number(hasilProduksi.bahan_campuran_eko))
 
   // Total presentase beras merk
   const persentaseBeras = () => {
@@ -99,7 +99,7 @@ const LaporanHasilProduksi = () => {
         : 0
     });
 
-    return persentaseBerasMerk.toFixed(1)
+    return persentaseBerasMerk.toFixed(2)
   }
 
   const persentaseBerasPk = () => {
@@ -117,7 +117,7 @@ const LaporanHasilProduksi = () => {
     const denominator = konstantaPembagi
 
     return denominator > 0
-      ? ((totalPersenGabung - hasilProduksi.total_pindah_bahan) / denominator * 100).toFixed(1)
+      ? ((totalPersenGabung - hasilProduksi.total_pindah_bahan) / denominator * 100).toFixed(2)
       : '-';
   }
 
@@ -350,7 +350,7 @@ const LaporanHasilProduksi = () => {
               <td>
                 {
                   hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14)
-                    ? (((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14).total * 25) / konstantaPembagi) * 100).toFixed(2) + '%'
+                    ? ((((hasilProduksi.total_hasil_produksi_tiap_produk.find(item => item.product_id === 14).total * 25) - hasilProduksi.bahan_campuran_eko) / konstantaPembagi) * 100).toFixed(2) + '%'
                     : "-"
                 }
               </td>
@@ -390,16 +390,17 @@ const LaporanHasilProduksi = () => {
       <div className='mx-20 my-5 flex justify-between'>
         <div className=''>
           <p>SISA DALAM SILO (BAHAN GILING - (TOTAL HASIL PRODUKSI - TOTAL BAHAN CAMPURAN))</p>
-          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ( {Number(totalHasilProduksiKg).toLocaleString('id-ID')} - {(Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)).toLocaleString('id-ID')})</p>
-          <p>= {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))).toLocaleString('id-ID')} KG</p>
+          <p>= {(hasilProduksi.total_bahan_giling * 50).toLocaleString('id-ID')} - ( {Number(totalHasilProduksiKg).toLocaleString('id-ID')} - {(Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah) + Number(hasilProduksi.bahan_campuran_eko)).toLocaleString('id-ID')})</p>
+          <p>= {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah) + Number(hasilProduksi.bahan_campuran_eko)))).toLocaleString('id-ID')} KG</p>
         </div>
         <div>
           <p>TOTAL PEMBELIAN: {Number(hasilProduksi.total_pembelian).toLocaleString('id-ID')}</p>
           <p>TOTAL PINDAH BAHAN: {Number(hasilProduksi.total_pindah_bahan).toLocaleString('id-ID')}</p>
           <p>BAHAN CAMPURAN PS: {Number(hasilProduksi.bahan_campuran_ps).toLocaleString('id-ID')}</p>
           <p>BAHAN CAMPURAN LEBAH: {Number(hasilProduksi.bahan_campuran_lebah).toLocaleString('id-ID')}</p>
+          <p>BAHAN CAMPURAN EKO: {Number(hasilProduksi.bahan_campuran_eko).toLocaleString('id-ID')}</p>
           <p>___________________________________ +</p>
-          <p className='font-bold'>TOTAL: {(Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)).toLocaleString('id-ID')}</p>
+          <p className='font-bold'>TOTAL: {(Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah) + Number(hasilProduksi.bahan_campuran_eko)).toLocaleString('id-ID')}</p>
         </div>
       </div>
     </div>
