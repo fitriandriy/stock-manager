@@ -583,6 +583,7 @@ const Produk = () => {
                 <option>Giling untuk Tepung</option>
                 <option>Giling untuk Lebah</option>
                 <option>Giling untuk Ketan</option>
+                <option>Giling untuk Ekonomi</option>
               </select>
             </div>
           </div>

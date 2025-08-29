@@ -209,7 +209,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[25]?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[25]?.keluar.jual}</td>
+                  <td>{reports[25]?.keluar.jual} + {reports[25]?.keluar.giling}</td>
                   <td>sak: {reports[25]?.hasil_giling}</td>
                 </tr>
                 <tr>
@@ -221,7 +221,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[26]?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[26]?.keluar.jual}</td>
+                  <td>{reports[26]?.keluar.jual} + {reports[26]?.keluar.giling}</td>
                   <td>sak: {reports[26]?.hasil_giling}</td>
                 </tr>
                 <tr>
@@ -233,7 +233,7 @@ const ProsesProduksi = () => {
                 <tr>
                   <td>{reports[27]?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[27]?.keluar.jual}</td>
+                  <td>{reports[27]?.keluar.jual} + {reports[27]?.keluar.giling}</td>
                   <td>sak: {reports[27]?.hasil_giling}</td>
                 </tr>
               </tbody>
