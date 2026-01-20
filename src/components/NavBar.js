@@ -107,7 +107,7 @@ const NavBar = () => {
                 <div>
                   <p
                     className={`cursor-pointer ${
-                      ["/retur"].includes(location.pathname)
+                      ["/retur", "/input-retur", "/retur-penjualan"].includes(location.pathname)
                         ? "underline text-blue-600"
                         : ""
                     }`}
@@ -123,7 +123,9 @@ const NavBar = () => {
                     anchorOrigin={{ vertical: "top", horizontal: "left" }}
                     transformOrigin={{ vertical: "top", horizontal: "left" }}
                   >
-                    <MenuItem onClick={() => navigate("/retur")}>Input Data</MenuItem>
+                    <MenuItem onClick={() => navigate("/input-retur")}>Input Retur</MenuItem>
+                    <MenuItem onClick={() => navigate("/retur-penjualan")}>Retur Penjualan</MenuItem>
+                    <MenuItem onClick={() => navigate("/retur")}>Retur Gudang</MenuItem>
                   </Menu>
                 </div>
 

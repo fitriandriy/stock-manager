@@ -381,3 +381,58 @@ export const addReturData = async(date, data) => {
     console.log(error)
   }
 }
+
+export const addSalesRetur = async(data) => {
+  try {
+    const response = await axios.post(`${ENDPOINT}/salesreturn`, {
+      data
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getSalesRetur = async (startDate, endDate, status) => {
+  try {
+    const response = await axios.get(
+      `${ENDPOINT}/salesreturn/${startDate}/${endDate}/${status}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching sales return:", error);
+  }
+};
+
+export const updateReturData = async (data) => {
+  try {
+    const response = await axios.put(
+      `${ENDPOINT}/salesreturn`,
+      { data },
+      { headers: { Authorization: `Bearer ${token}` }}
+    )
+    return response
+  } catch (error) {
+    console.error("Error fetching sales return:", error);
+  }
+}
+
+export const deleteRetur = async (id) => {
+  try {
+    const response = await axios.delete(`${ENDPOINT}/salesreturn/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response
+  } catch (error) {
+    console.log(error)
+  }
+}

@@ -25,4 +25,8 @@ th, td {
   text-align: center;
 }
 
-
+@media print {
+  body {
+    margin: 0;
+  }
+}
