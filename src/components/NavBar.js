@@ -107,7 +107,7 @@ const NavBar = () => {
                 <div>
                   <p
                     className={`cursor-pointer ${
-                      ["/retur"].includes(location.pathname)
+                      ["/retur", "/input-retur", "/retur-penjualan"].includes(location.pathname)
                         ? "underline text-blue-600"
                         : ""
                     }`}
