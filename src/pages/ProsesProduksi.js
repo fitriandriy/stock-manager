@@ -7,6 +7,8 @@ import "react-datepicker/dist/react-datepicker.css";
 const ProsesProduksi = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [reports, setReports] = useState([])
+  const [beli64, setBeli64] = useState([])
+  const [beliBr, setBeliBr] = useState([])
   const [purchase, setPurchase] = useState('')
   const date = startDate.toLocaleDateString('en-CA')
 
@@ -15,6 +17,8 @@ const ProsesProduksi = () => {
       try {
         const response = await getProductionProcessReport(date)
         setReports(response.data.data)
+        setBeli64(response.data.beli64)
+        setBeliBr(response.data.beliBr)
         setPurchase(response.data.pembelian)
       } catch (err) {
         alert(err.message)
@@ -52,9 +56,16 @@ const ProsesProduksi = () => {
           </div>
         </div>
         <div className='flex justify-evenly mt-5 p-1 bg-[#e2e0e0] mx-44 rounded-lg'>
-          <p className='font-bold'>STOK BAHAN :</p>
-          <p>IR 64 : {(parseInt(reports[0]?.stock) * 50).toLocaleString('id-ID')} KG</p>
-          <p>BRAMO : {(parseInt(reports[1]?.stock) * 50).toLocaleString('id-ID')} KG</p>
+          <div className='flex justify-between gap-10'>
+            <p className='font-bold'>BAHAN BELI : {reports.beli64}</p>
+            <p>IR 64 : {(beli64 * 50).toLocaleString('id-ID')} KG</p>
+            <p>BRAMO : {(beliBr * 50).toLocaleString('id-ID')} KG</p>
+          </div>
+          <div className='flex justify-between gap-10'>
+            <p className='font-bold'>STOK BAHAN :</p>
+            <p>IR 64 : {(parseInt(reports[0]?.stock) * 50).toLocaleString('id-ID')} KG</p>
+            <p>BRAMO : {(parseInt(reports[1]?.stock) * 50).toLocaleString('id-ID')} KG</p>
+          </div>
         </div>
         <div className='flex gap-5 justify-between mx-44 pt-5 mb-10'>
           <div>

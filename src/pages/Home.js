@@ -654,7 +654,7 @@ const Home = () => {
           </ToggleButtonGroup>
         </div>
   
-        <div className="overflow-x-auto mt-5 mx-20 h-80 border border-1 rounded-xl">
+        <div className="overflow-x-auto mt-5 mb-5 mx-20 h-[480px] border border-1 rounded-xl">
           <table className="text-[12px] table-auto overflow-auto border-collapse border border-gray-800 text-center w-full">
             <thead className="sticky top-0 bg-blue-1">
               <tr className="bg-blue-600 text-[white]">
@@ -772,7 +772,7 @@ const Home = () => {
                 ))
               }
               {
-                Array.from({ length: Math.max(0, 9 - stocks.length) }).map((_, idx) => (
+                Array.from({ length: Math.max(0, 15 - stocks.length) }).map((_, idx) => (
                   <tr key={`empty-${idx}`}>
                     <td className="border border-gray-800">&nbsp;</td>
                     <td className="border border-gray-800">&nbsp;</td>
