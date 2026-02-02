@@ -46,14 +46,17 @@ const PrintRetur = forwardRef(({ data }, ref) => {
           <div
             key={index}
             style={{
-              padding: "20px",
-              pageBreakAfter: "always",
-              fontSize: "12px",
-              color: "black",
-              fontFamily: "Arial"
-            }}
+            minHeight: "14cm",
+            maxHeight: "14cm",
+            padding: "20px 20px",
+            fontSize: "18px",
+            lineHeight: "1.25",
+            fontFamily: "Arial",
+            boxSizing: "border-box",
+            pageBreakAfter: index === data.length - 1 ? "auto" : "always"
+          }}
           >
-            <h2 className="text-center mb-[20px] font-bold text-[14px]">
+            <h2 className="text-center mt-[20px] mb-[20px] font-bold text-[20px]">
               RETUR BARANG
             </h2>
 
@@ -98,8 +101,9 @@ const PrintRetur = forwardRef(({ data }, ref) => {
             </table>
 
             <table
+              className="no-border-table"
               width="100%"
-              border="1"
+              border="0"
               cellPadding="5"
               style={{ borderCollapse: "collapse" }}
             >
@@ -139,15 +143,15 @@ const PrintRetur = forwardRef(({ data }, ref) => {
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "40px" }}>
               <div>
                 <p>Sopir</p>
-                <p className="pt-7">________</p>
+                <p className="pt-7">____</p>
               </div>
               <div>
                 <p>Admin</p>
-                <p className="pt-7">________</p>
+                <p className="pt-7">____</p>
               </div>
               <div>
                 <p>Pelanggan</p>
-                <p className="pt-7">__________</p>
+                <p className="pt-7">____</p>
               </div>
             </div>
           </div>

@@ -167,6 +167,7 @@ const Pembelian = () => {
               >
                 <option value={1}>IRAWATI</option>
                 <option value={3}>BULOG KOM</option>
+                <option value={7}>Edya Jaya</option>
               </select>
             </div>
             <div className='flex justify-between my-2'>
