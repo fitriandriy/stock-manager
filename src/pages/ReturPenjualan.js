@@ -19,6 +19,7 @@ const ReturPenjualan = () => {
   const [data, setData] = useState([])       // data setelah transform & filter
   const [dataId, setDataId] = useState()
   const [originalData, setOriginalData] = useState([])
+  const [filteredData, setFilteredData] = useState([])
 
   const [status, setStatus] = useState("all")
   const [name, setName] = useState("")
@@ -289,17 +290,19 @@ const ReturPenjualan = () => {
   }, [startDate, endDate, status])
 
   useEffect(() => {
-    let filtered = [...retur]
-
-    // filter name
-    if (name) {
-      filtered = filtered.filter(item =>
-        item.toko.toLowerCase().includes(name.toLowerCase())
-      )
+    if (!name) {
+      setFilteredData(data)
+      return
     }
 
-    setData(transformSalesReturData(filtered))
-  }, [name, retur])
+    const filtered = data.filter(row =>
+      row["NAMA TOKO"]
+        ?.toLowerCase()
+        .includes(name.toLowerCase())
+    )
+
+    setFilteredData(filtered)
+  }, [name, data])
 
   const handleSubmit = async () => {
     try {
@@ -424,63 +427,41 @@ const ReturPenjualan = () => {
           </thead>
 
           <tbody>
-            {/* {
-              data.map((row, rowIndex) => (
-                <tr key={rowIndex} onContextMenu={(event) => handleRightClick(event, rowIndex, row.ID)} className={activeRow === rowIndex ? "border-2" : ""}>
-                  {columns.map((col, colIndex) => (
-                    <td key={col.key} className="border p-1 text-[12px]">
-                      {col.key === "NO" ? (
-                        <div className="text-center py-1 bg-gray-50">{row[col.key]}</div>
-                      ) : (
-                        <input
-                          ref={(el) =>
-                            (inputsRef.current[rowIndex * columns.length + colIndex] = el)
-                          }
-                          value={row[col.key] || ""}
-                          readOnly={!normalFieldMap[col.key]}
-                          onChange={(e) => handleChange(rowIndex, col.key, e.target.value)}
-                          onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
-                          className="w-full outline-none p-1 text-center"
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            } */}
             {
-              data.map((row, rowIndex) => (
-                <tr
-                  key={row.ID}
-                  onContextMenu={(event) => handleRightClick(event, rowIndex, row.ID)}
-                  className={activeRow === rowIndex ? "border-2" : ""}
-                >
-                  {columns.map((col, colIndex) => (
-                    <td key={col.key} className="border p-1 text-[12px]">
-                      {col.key === "NO" ? (
-                        <div className="text-center py-1 bg-gray-50">
-                          {row[col.key]}
-                        </div>
-                      ) : (
-                        <input
-                          ref={(el) =>
-                            (inputsRef.current[rowIndex * columns.length + colIndex] = el)
-                          }
-                          value={row[col.key] || ""}
-                          readOnly={!normalFieldMap[col.key]}
-                          onChange={(e) =>
-                            handleChange(rowIndex, col.key, e.target.value)
-                          }
-                          onKeyDown={(e) =>
-                            handleKeyDown(e, rowIndex, colIndex)
-                          }
-                          className="w-full outline-none p-1 text-center"
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              filteredData.map((row) => {
+                const rowIndex = data.findIndex(d => d.ID === row.ID)
+                return (
+                  <tr
+                    key={row.ID}
+                    onContextMenu={(event) => handleRightClick(event, rowIndex, row.ID)}
+                    className={activeRow === rowIndex ? "border-2" : ""}
+                  >
+                    {columns.map((col, colIndex) => (
+                      <td key={col.key} className="border p-1 text-[12px]">
+                        {col.key === "NO" ? (
+                          <div className="text-center py-1 bg-gray-50">
+                            {row[col.key]}
+                          </div>
+                        ) : (
+                          <input
+                            ref={(el) =>
+                              (inputsRef.current[rowIndex * columns.length + colIndex] = el)
+                            }
+                            value={row[col.key] || ""}
+                            readOnly={!normalFieldMap[col.key]}
+                            onChange={(e) =>
+                              handleChange(rowIndex, col.key, e.target.value)
+                            }
+                            onKeyDown={(e) =>
+                              handleKeyDown(e, rowIndex, colIndex)
+                            }
+                            className="w-full outline-none p-1 text-center"
+                          />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                )})
             }
             {
               Array.from({ length: Math.max(0, 13 - data.length) }).map((_, idx) => (
