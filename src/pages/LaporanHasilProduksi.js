@@ -11,7 +11,7 @@ const LaporanHasilProduksi = () => {
     const fetchData = async () => {
       try {
         const hasil = await getHasilProduksi();
-        // console.log(`HAAAASILLLL ${JSON.stringify(hasil.data)}`)
+        console.log(`HAAAASILLLL ${JSON.stringify(hasil.data)}`)
         // console.log("HASIL:", hasil.data);
         setHasilProduksi(hasil.data);
       } catch (err) {
@@ -59,10 +59,8 @@ const LaporanHasilProduksi = () => {
     { product_id: 15, beratKemasan: 50 },
     { product_id: 16, beratKemasan: 25 },
     { product_id: 17, beratKemasan: 10 },
-    { product_id: 18, beratKemasan: 50 },
     { product_id: 19, beratKemasan: 50 },
     { product_id: 22, beratKemasan: 25 },
-    { product_id: 23, beratKemasan: 50 },
     { product_id: 24, beratKemasan: 1 },
     { product_id: 25, beratKemasan: 1 },
     { product_id: 26, beratKemasan: 25 },
@@ -155,11 +153,11 @@ const LaporanHasilProduksi = () => {
         <div>
           <div className='flex'>
             <p>SISA DI DALAM SILO</p>
-            <p className='font-bold'>: {((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))).toLocaleString('id-ID')} kg</p>
+            <p className='font-bold'>: {(((hasilProduksi.total_bahan_giling * 50) + hasilProduksi.total_retur) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah) + Number(hasilProduksi.bahan_campuran_eko)))).toLocaleString('id-ID')} kg</p>
           </div>
           <div className='flex'>
             <p>TOTAL BAHAN LOST</p>
-            <p className='font-bold'>: {((((hasilProduksi.total_bahan_giling * 50) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))) / (hasilProduksi.total_bahan_giling * 50)) * 100).toLocaleString('id-ID')} %</p>
+            <p className='font-bold'>: {(((((hasilProduksi.total_bahan_giling * 50) + hasilProduksi.total_retur) - (totalHasilProduksiKg - (Number(hasilProduksi.total_pembelian) + Number(hasilProduksi.total_pindah_bahan) + Number(hasilProduksi.bahan_campuran_ps) + Number(hasilProduksi.bahan_campuran_lebah)))) / (hasilProduksi.total_bahan_giling * 50)) * 100).toLocaleString('id-ID')} %</p>
           </div>
         </div>
       </div>

@@ -17,6 +17,7 @@ const ProsesProduksi = () => {
       try {
         const response = await getProductionProcessReport(date)
         setReports(response.data.data)
+        console.log(`INI REPORTS ${JSON.stringify(reports)}`)
         setBeli64(response.data.beli64)
         setBeliBr(response.data.beliBr)
         setPurchase(response.data.pembelian)
@@ -28,6 +29,7 @@ const ProsesProduksi = () => {
     if (startDate) {
       fetchData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, date])
 
   if (!reports) {
@@ -82,170 +84,170 @@ const ProsesProduksi = () => {
                 <tr>
                   <td className='text-left'>BERAS PS @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[2]?.stock}</td>
-                  <td>{reports[2]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 3)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 3)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[2]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 3)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[2]?.keluar.jual}</td>
-                  <td>sak: {(reports[2]?.hasil_giling * 25)/25}</td>
+                  <td>{reports.find(r => r.product_id === 3)?.keluar.jual}</td>
+                  <td>sak: {(reports.find(r => r.product_id === 3)?.hasil_giling * 25)/25}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PS @ 10 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[3]?.stock}</td>
-                  <td>{reports[3]?.hasil_giling * 10} KG</td>
+                  <td>{reports.find(r => r.product_id === 4)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 4)?.hasil_giling * 10} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[3]?.stock * 10}</td>
+                  <td>{reports.find(r => r.product_id === 4)?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[3]?.keluar.jual}</td>
-                  <td>sak: {(reports[3]?.hasil_giling * 10)/10}</td>
+                  <td>{reports.find(r => r.product_id === 4)?.keluar.jual}</td>
+                  <td>sak: {(reports.find(r => r.product_id === 4)?.hasil_giling * 10)/10}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PS @ 5 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[4]?.stock}</td>
-                  <td>{reports[4]?.hasil_giling * 5} {purchase ? '- ' + purchase : ''} KG</td>
+                  <td>{reports.find(r => r.product_id === 5)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 5)?.hasil_giling * 5} {purchase ? '- ' + purchase : ''} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[4]?.stock * 5}</td>
+                  <td>{reports.find(r => r.product_id === 5)?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[4]?.keluar.jual}</td>
-                  <td>sak: {(reports[4]?.hasil_giling * 5)/5} {purchase ? '- ' + (purchase / 5) : ''}</td>
+                  <td>{reports.find(r => r.product_id === 5)?.keluar.jual}</td>
+                  <td>sak: {(reports.find(r => r.product_id === 5)?.hasil_giling * 5)/5} {purchase ? '- ' + (purchase / 5) : ''}</td>
                 </tr>
                 <tr>
-                  <td className='text-left'>BROKEN @ 50 KG</td>
+                  <td className='text-left'>MENIR KETAN @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[17]?.stock}</td>
-                  <td>{reports[17]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 18)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 18)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[17]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 18)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[17]?.keluar.jual}</td>
+                  <td>{reports.find(r => r.product_id === 18)?.keluar.jual}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>MENIR KIBI @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[18]?.stock}</td>
-                  <td>{reports[18]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 19)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 19)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[18]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 19)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[18]?.keluar.jual} + {reports[18]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 19)?.keluar.jual} + {reports.find(r => r.product_id === 19)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>MENIR @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[12]?.stock}</td>
-                  <td>{reports[12]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 13)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 13)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[12]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 13)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[12]?.keluar.jual} + {reports[12]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 13)?.keluar.jual} + {reports.find(r => r.product_id === 13)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>TEPUNG @ 10 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[19]?.stock}</td>
-                  <td>{reports[19]?.hasil_giling * 10} KG</td>
+                  <td>{reports.find(r => r.product_id === 20)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 20)?.hasil_giling * 10} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[19]?.stock * 10}</td>
+                  <td>{reports.find(r => r.product_id === 20)?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[19]?.keluar.jual}</td>
-                  <td>roll: {((reports[19]?.hasil_giling * 10)/1500).toFixed(1)}</td>
+                  <td>{reports.find(r => r.product_id === 20)?.keluar.jual}</td>
+                  <td>roll: {((reports.find(r => r.product_id === 20)?.hasil_giling * 10)/1500).toFixed(1)}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>TAPIOKA @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[20]?.stock}</td>
-                  <td>{reports[20]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 21)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 21)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[20]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 21)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[20]?.keluar.jual} + {reports[20]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 21)?.keluar.jual} + {reports.find(r => r.product_id === 21)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>KIBI POLOS @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[21]?.stock}</td>
-                  <td>{reports[21]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 22)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 22)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[21]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 22)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[21]?.keluar.jual}</td>
-                  <td>sak: {(reports[21]?.hasil_giling * 25)/25}</td>
+                  <td>{reports.find(r => r.product_id === 22)?.keluar.jual}</td>
+                  <td>sak: {(reports.find(r => r.product_id === 22)?.hasil_giling * 25)/25}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS REJECT @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[14]?.stock}</td>
-                  <td>{reports[14]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 15)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 15)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[14]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 15)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[14]?.keluar.jual} + {reports[14]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 15)?.keluar.jual} + {reports.find(r => r.product_id === 15)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
-                  <td className='text-left'>BERAS MURMER @ 25 KG</td>
+                  <td className='text-left'>REJECT KETAN</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[22]?.stock}</td>
-                  <td>{reports[22]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 23)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 23)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[22]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 23)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[22]?.keluar.jual}</td>
+                  <td>{reports.find(r => r.product_id === 23)?.keluar.jual}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PS KUNING @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[25]?.stock}</td>
-                  <td>{reports[25]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 26)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 26)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[25]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 26)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[25]?.keluar.jual} + {reports[25]?.keluar.giling}</td>
-                  <td>sak: {reports[25]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 26)?.keluar.jual} + {reports.find(r => r.product_id === 26)?.keluar.giling}</td>
+                  <td>sak: {reports.find(r => r.product_id === 26)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PS KUNING @ 10 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[26]?.stock}</td>
-                  <td>{reports[26]?.hasil_giling * 10} KG</td>
+                  <td>{reports.find(r => r.product_id === 27)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 27)?.hasil_giling * 10} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[26]?.stock * 10}</td>
+                  <td>{reports.find(r => r.product_id === 27)?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[26]?.keluar.jual} + {reports[26]?.keluar.giling}</td>
-                  <td>sak: {reports[26]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 27)?.keluar.jual} + {reports.find(r => r.product_id === 27)?.keluar.giling}</td>
+                  <td>sak: {reports.find(r => r.product_id === 27)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PS KUNING @ 5 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[27]?.stock}</td>
-                  <td>{reports[27]?.hasil_giling * 5} KG</td>
+                  <td>{reports.find(r => r.product_id === 28)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 28)?.hasil_giling * 5} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[27]?.stock * 5}</td>
+                  <td>{reports.find(r => r.product_id === 28)?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[27]?.keluar.jual} + {reports[27]?.keluar.giling}</td>
-                  <td>sak: {reports[27]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 28)?.keluar.jual} + {reports.find(r => r.product_id === 28)?.keluar.giling}</td>
+                  <td>sak: {reports.find(r => r.product_id === 28)?.hasil_giling}</td>
                 </tr>
               </tbody>
             </table>
@@ -264,170 +266,170 @@ const ProsesProduksi = () => {
               <tr>
                   <td className='text-left'>BAHAN BAKU IR 64</td>
                   <td></td>
-                  <td>{reports[0]?.keluar.giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 1)?.keluar.giling * 50} KG</td>
                   <td>{}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BAHAN BAKU MEMBRAMO</td>
                   <td></td>
-                  <td>{reports[1]?.keluar.giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 2)?.keluar.giling * 50} KG</td>
                   <td>{}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PRE @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[5]?.stock}</td>
-                  <td>{reports[5]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 6)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 6)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[5]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 6)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[5]?.keluar.jual}</td>
-                  <td>sak: {reports[5]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 6)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 6)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PRE @ 10 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[6]?.stock}</td>
-                  <td>{reports[6]?.hasil_giling * 10} KG</td>
+                  <td>{reports.find(r => r.product_id === 7)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 7)?.hasil_giling * 10} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[6]?.stock * 10}</td>
+                  <td>{reports.find(r => r.product_id === 7)?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[6]?.keluar.jual}</td>
-                  <td>sak: {reports[6]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 7)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 7)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS PRE @ 5 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[7]?.stock}</td>
-                  <td>{reports[7]?.hasil_giling * 5} KG</td>
+                  <td>{reports.find(r => r.product_id === 8)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 8)?.hasil_giling * 5} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[7]?.stock * 5}</td>
+                  <td>{reports.find(r => r.product_id === 8)?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[7]?.keluar.jual}</td>
-                  <td>sak: {reports[7]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 8)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 8)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS MANGGA @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[8]?.stock}</td>
-                  <td>{reports[8]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 9)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 9)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[8]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 9)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[8]?.keluar.jual}</td>
-                  <td>sak: {reports[8]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 9)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 9)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS MANGGA @ 10 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[9]?.stock}</td>
-                  <td>{reports[9]?.hasil_giling * 10} KG</td>
+                  <td>{reports.find(r => r.product_id === 10)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 10)?.hasil_giling * 10} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[9]?.stock * 10}</td>
+                  <td>{reports.find(r => r.product_id === 10)?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[9]?.keluar.jual}</td>
-                  <td>sak: {reports[9]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 10)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 10)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS MANGGA @ 5 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[28]?.stock}</td>
-                  <td>{reports[28]?.hasil_giling * 5} KG</td>
+                  <td>{reports.find(r => r.product_id === 29)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 29)?.hasil_giling * 5} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[28]?.stock * 5}</td>
+                  <td>{reports.find(r => r.product_id === 29)?.stock * 5}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[28]?.keluar.jual}</td>
-                  <td>sak: {reports[28]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 29)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 29)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS LEBAH @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[15]?.stock}</td>
-                  <td>{reports[15]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 16)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 16)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[15]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 16)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[15]?.keluar.jual}</td>
-                  <td>sak: {reports[15]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 16)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 16)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS LEBAH @ 10 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[16]?.stock}</td>
-                  <td>{reports[16]?.hasil_giling * 10} KG</td>
+                  <td>{reports.find(r => r.product_id === 17)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 17)?.hasil_giling * 10} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[16]?.stock * 10}</td>
+                  <td>{reports.find(r => r.product_id === 17)?.stock * 10}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[16]?.keluar.jual}</td>
-                  <td>sak: {reports[16]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 17)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 17)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>BROKEN PREMIUM @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[10]?.stock}</td>
-                  <td>{reports[10]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 11)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 11)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[10]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 11)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[10]?.keluar.jual} + {reports[10]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 11)?.keluar.jual} + {reports.find(r => r.product_id === 11)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>MENIR KIBI PREM @ 50 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[11]?.stock}</td>
-                  <td>{reports[11]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 12)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 12)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[11]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 12)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[11]?.keluar.jual} + {reports[11]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 12)?.keluar.jual} + {reports.find(r => r.product_id === 12)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>BERAS EKONOMI @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[13]?.stock}</td>
-                  <td>{reports[13]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 14)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 14)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[13]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 14)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[13]?.keluar.jual} + {reports[13]?.keluar.giling}</td>
-                  <td>sak: {reports[13]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 14)?.keluar.jual} + {reports.find(r => r.product_id === 14)?.keluar.giling}</td>
+                  <td>sak: {reports.find(r => r.product_id === 14)?.hasil_giling}</td>
                 </tr>
                 <tr>
                   <td className='text-left'>KETAN PUTIH</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[29]?.stock}</td>
-                  <td>{reports[29]?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 18)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 18)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[29]?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 18)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[29]?.keluar.jual} + {reports[29]?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 18)?.keluar.jual} + {reports.find(r => r.product_id === 18)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>
                   <td className='text-left'>KETAN PS @ 25 KG</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports[30]?.stock}</td>
-                  <td>{reports[30]?.hasil_giling * 25} KG</td>
+                  <td>{reports.find(r => r.product_id === 31)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 31)?.hasil_giling * 25} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports[30]?.stock * 25}</td>
+                  <td>{reports.find(r => r.product_id === 31)?.stock * 25}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports[30]?.keluar.jual}</td>
-                  <td>sak: {reports[30]?.hasil_giling}</td>
+                  <td>{reports.find(r => r.product_id === 31)?.keluar.jual}</td>
+                  <td>sak: {reports.find(r => r.product_id === 31)?.hasil_giling}</td>
                 </tr>
               </tbody>
             </table>

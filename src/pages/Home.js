@@ -57,6 +57,7 @@ const Home = () => {
   const [plateNumber, setPlateNumber] = useState()
   const [contextMenu, setContextMenu] = useState({ visible: false, x: null, y: null, rowIndex: null });
   const [activeRow, setActiveRow] = useState(null);
+  const [loading, setLoading] = useState(false);
   
   const handleContextOrLongPress = (e, idx, id) => {
     e.preventDefault();
@@ -252,6 +253,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         if (!startDate) return;
 
         let targetWarehouse = warehouse;
@@ -276,6 +278,8 @@ const Home = () => {
         setCustomers(customer.data.data);
       } catch (err) {
         alert(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -583,18 +587,19 @@ const Home = () => {
         </Modal>
   
         {/* BUTTON GROUP */}
-        <div className='border border-[#f4f4f4] flex gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
+        <div className='border border-[#f4f4f4] gap-5 px-5 mx-20 rounded-2xl p-1 shadow-md shadow-[#707070] mt-5'>
           <ToggleButtonGroup
             color="primary"
             value={warehouse}
             exclusive
             onChange={handleChange}
             aria-label="Platform"
+            className='flex justify-between w-full'
           >
             <ToggleButton
-              className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+              className={`border !border-[white] rounded-full !w-full !p-[1px] ${
                 warehouse === 1
-                  ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                  ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                   : ""
               }`}
               value={1}
@@ -602,9 +607,9 @@ const Home = () => {
               GD1
             </ToggleButton>
             <ToggleButton
-              className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+              className={`border !border-[white] rounded-full !w-full !p-[1px] ${
                 warehouse === 2
-                  ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                  ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                   : ""
               }`}
               value={2}
@@ -612,9 +617,9 @@ const Home = () => {
               GD2
             </ToggleButton>
             <ToggleButton
-              className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+              className={`border !border-[white] rounded-full !w-full !p-[1px] ${
                 warehouse === 3
-                  ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                  ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                   : ""
               }`}
               value= {3}
@@ -622,9 +627,9 @@ const Home = () => {
               GD3
             </ToggleButton>
             <ToggleButton
-              className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+              className={`border !border-[white] rounded-full !w-full !p-[1px] ${
                 warehouse === 4
-                  ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                  ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                   : ""
               }`}
               value={4}
@@ -632,9 +637,9 @@ const Home = () => {
               GD4
             </ToggleButton>
             <ToggleButton
-              className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+              className={`border !border-[white] rounded-full !w-full !p-[1px] ${
                 warehouse === 5
-                  ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                  ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                   : ""
               }`}
               value={5}
@@ -642,9 +647,9 @@ const Home = () => {
               GD5
             </ToggleButton>
             <ToggleButton
-              className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+              className={`border !border-[white] rounded-full !w-full !p-[1px] ${
                 warehouse === 6
-                  ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                  ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                   : ""
               }`}
               value={6}
@@ -684,92 +689,101 @@ const Home = () => {
               </tr>
             </thead>          
             <tbody className='text-[#000000] border-[white]'>
-              { role === "superadmin" ?
-                stocks.map((row, idx) => (
-                  <tr key={idx} onContextMenu={(event) => handleRightClick(event, idx, row.id)} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
-                    <td>{idx + 1}</td>
-                    <td 
-                      className={
-                        row.transaction_type === 'giling' 
-                          ? 'text-[white] bg-[red] text-left w-[150px]' 
-                          : row.transaction_type === 'pindah'
-                          ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
-                          : row.transaction_type === 'jual'
-                          ? 'text-[#000000] bg-[#52ff0d] text-left w-[150px]'
-                          : 'text-left w-[150px]'
-                      }>
-                      {
-                        row.transaction_type === 'giling' 
-                          ? 'GILING' 
-                          : row.transaction_type === 'pindah' 
-                          ? row.description.toUpperCase()
-                          : row.transaction_type === 'jual' 
-                          ? row.customer.toUpperCase()
-                          : row.supplier === 'Others' 
-                          ? row.description.toUpperCase()
-                          : row.supplier.toUpperCase()
-                      }
+              {
+                loading ? (
+                  <tr>
+                    <td colSpan="18" className="text-center py-4">
+                      Loading...
                     </td>
-                    <td>{ row.plate_number }</td>
-                    <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{row.totalA}</td>
-                    <td>{row.totalB}</td>
-                    <td>{row.totalC}</td>
-                    <td>{row.totalBr}</td>
-                    <td>{row.totalIR64}</td>
-                    <td>{row.totalGlobalBr}</td>
                   </tr>
-                ))
-                :
-                stocks.map((row, idx) => (
-                  <tr key={idx}>
-                    <td>{idx + 1}</td>
-                    <td 
-                      className={
-                        row.transaction_type === 'giling' 
-                          ? 'text-[white] bg-[red] text-left w-[150px]' 
-                          : row.transaction_type === 'pindah'
-                          ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
-                          : row.transaction_type === 'jual'
-                          ? 'text-[#000000] bg-[#66ff0d] text-left w-[150px]'
-                          : 'text-left w-[150px]'
-                      }>
-                      {
-                        row.transaction_type === 'giling' 
-                          ? 'GILING' 
-                          : row.transaction_type === 'pindah' 
-                          ? row.description.toUpperCase()
-                          : row.transaction_type === 'jual' 
-                          ? row.customer.toUpperCase()
-                          : row.supplier === 'Others' 
-                          ? row.description.toUpperCase()
-                          : row.supplier.toUpperCase()
-                      }
-                    </td>
-                    <td>{ row.plate_number }</td>
-                    <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
-                    <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
-                    <td>{row.totalA}</td>
-                    <td>{row.totalB}</td>
-                    <td>{row.totalC}</td>
-                    <td>{row.totalBr}</td>
-                    <td>{row.totalIR64}</td>
-                    <td>{row.totalGlobalBr}</td>
-                  </tr>
-                ))
+                ) : (
+                  role === "superadmin" ?
+                  stocks.map((row, idx) => (
+                    <tr key={idx} onContextMenu={(event) => handleRightClick(event, idx, row.id)} className={activeRow === idx ? "bg-[#d2c1ff]" : ""}>
+                      <td>{idx + 1}</td>
+                      <td 
+                        className={
+                          row.transaction_type === 'giling' 
+                            ? 'text-[white] bg-[red] text-left w-[150px]' 
+                            : row.transaction_type === 'pindah'
+                            ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
+                            : row.transaction_type === 'jual'
+                            ? 'text-[#000000] bg-[#52ff0d] text-left w-[150px]'
+                            : 'text-left w-[150px]'
+                        }>
+                        {
+                          row.transaction_type === 'giling' 
+                            ? 'GILING' 
+                            : row.transaction_type === 'pindah' 
+                            ? row.description.toUpperCase()
+                            : row.transaction_type === 'jual' 
+                            ? row.customer.toUpperCase()
+                            : row.supplier === 'Others' 
+                            ? row.description.toUpperCase()
+                            : row.supplier.toUpperCase()
+                        }
+                      </td>
+                      <td>{ row.plate_number }</td>
+                      <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{row.totalA}</td>
+                      <td>{row.totalB}</td>
+                      <td>{row.totalC}</td>
+                      <td>{row.totalBr}</td>
+                      <td>{row.totalIR64}</td>
+                      <td>{row.totalGlobalBr}</td>
+                    </tr>
+                  ))
+                  :
+                  stocks.map((row, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td 
+                        className={
+                          row.transaction_type === 'giling' 
+                            ? 'text-[white] bg-[red] text-left w-[150px]' 
+                            : row.transaction_type === 'pindah'
+                            ? 'text-[#000000] bg-[#fbff0d] text-left w-[150px]'
+                            : row.transaction_type === 'jual'
+                            ? 'text-[#000000] bg-[#66ff0d] text-left w-[150px]'
+                            : 'text-left w-[150px]'
+                        }>
+                        {
+                          row.transaction_type === 'giling' 
+                            ? 'GILING' 
+                            : row.transaction_type === 'pindah' 
+                            ? row.description.toUpperCase()
+                            : row.transaction_type === 'jual' 
+                            ? row.customer.toUpperCase()
+                            : row.supplier === 'Others' 
+                            ? row.description.toUpperCase()
+                            : row.supplier.toUpperCase()
+                        }
+                      </td>
+                      <td>{ row.plate_number }</td>
+                      <td>{ row.material === 'A' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'B' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'C' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'Bramo' && row.transaction_type === 'masuk' ? row.amount : '' }</td>
+                      <td>{ row.material === 'A' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'B' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'C' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{ row.material === 'Bramo' && (row.transaction_type === 'giling' || row.transaction_type === 'pindah' || row.transaction_type === 'jual') ? row.amount : '' }</td>
+                      <td>{row.totalA}</td>
+                      <td>{row.totalB}</td>
+                      <td>{row.totalC}</td>
+                      <td>{row.totalBr}</td>
+                      <td>{row.totalIR64}</td>
+                      <td>{row.totalGlobalBr}</td>
+                    </tr>
+                  ))
+                )
               }
               {
                 Array.from({ length: Math.max(0, 15 - stocks.length) }).map((_, idx) => (

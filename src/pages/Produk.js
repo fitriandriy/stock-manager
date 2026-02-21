@@ -625,11 +625,12 @@ const Produk = () => {
           exclusive
           onChange={handleChange}
           aria-label="Platform"
+          className='flex justify-between w-full'
         >
           <ToggleButton
-            className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+            className={`border !border-[white] rounded-full !w-full !p-[1px] ${
               warehouse === 1
-                ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                 : ""
             }`}
             value={1}
@@ -637,9 +638,9 @@ const Produk = () => {
             GD1
           </ToggleButton>
           <ToggleButton
-            className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+            className={`border !border-[white] rounded-full !w-full !p-[1px] ${
               warehouse === 2
-                ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                 : ""
             }`}
             value={2}
@@ -647,9 +648,9 @@ const Produk = () => {
             GD2
           </ToggleButton>
           <ToggleButton
-            className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+            className={`border !border-[white] rounded-full !w-full !p-[1px] ${
               warehouse === 3
-                ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                 : ""
             }`}
             value= {3}
@@ -657,9 +658,9 @@ const Produk = () => {
             GD3
           </ToggleButton>
           <ToggleButton
-            className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+            className={`border !border-[white] rounded-full !w-full !p-[1px] ${
               warehouse === 4
-                ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                 : ""
             }`}
             value={4}
@@ -667,9 +668,9 @@ const Produk = () => {
             GD4
           </ToggleButton>
           <ToggleButton
-            className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+            className={`border !border-[white] rounded-full !w-full !p-[1px] ${
               warehouse === 5
-                ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                 : ""
             }`}
             value={5}
@@ -677,9 +678,9 @@ const Produk = () => {
             GD5
           </ToggleButton>
           <ToggleButton
-            className={`border !border-[white] rounded-full !w-[100px] !p-[1px] ${
+            className={`border !border-[white] rounded-full !w-full !p-[1px] ${
               warehouse === 6
-                ? "!rounded-full !w-[100px] !p-1 !bg-blue-1 !text-[white] !font-bold"
+                ? "!rounded-full !w-full !p-1 !bg-blue-1 !text-[white] !font-bold"
                 : ""
             }`}
             value={6}
