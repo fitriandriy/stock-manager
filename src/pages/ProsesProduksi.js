@@ -263,7 +263,7 @@ const ProsesProduksi = () => {
                 </tr>
               </thead>
               <tbody className='text-[12px]'>
-              <tr>
+                <tr>
                   <td className='text-left'>BAHAN BAKU IR 64</td>
                   <td></td>
                   <td>{reports.find(r => r.product_id === 1)?.keluar.giling * 50} KG</td>
@@ -410,13 +410,13 @@ const ProsesProduksi = () => {
                 <tr>
                   <td className='text-left'>KETAN PUTIH</td>
                   <td className='text-left'>STOK</td>
-                  <td>{reports.find(r => r.product_id === 18)?.stock}</td>
-                  <td>{reports.find(r => r.product_id === 18)?.hasil_giling * 50} KG</td>
+                  <td>{reports.find(r => r.product_id === 30)?.stock}</td>
+                  <td>{reports.find(r => r.product_id === 30)?.hasil_giling * 50} KG</td>
                 </tr>
                 <tr>
-                  <td>{reports.find(r => r.product_id === 18)?.stock * 50}</td>
+                  <td>{reports.find(r => r.product_id === 30)?.stock * 50}</td>
                   <td className='text-left'>KELUAR</td>
-                  <td>{reports.find(r => r.product_id === 18)?.keluar.jual} + {reports.find(r => r.product_id === 18)?.keluar.giling}</td>
+                  <td>{reports.find(r => r.product_id === 30)?.keluar.jual} + {reports.find(r => r.product_id === 30)?.keluar.giling}</td>
                   <td></td>
                 </tr>
                 <tr>

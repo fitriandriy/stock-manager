@@ -32,13 +32,6 @@ const ReturPenjualan = () => {
   const [activeRow, setActiveRow] = useState(null);
 
   const inputsRef = useRef([])
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [filteredData]);
 
   const style = {
     position: 'absolute',
@@ -418,7 +411,7 @@ const ReturPenjualan = () => {
       </div>
 
       {/* TABEL */}
-      <div ref={scrollRef} className="h-[70vh] overflow-y-auto border mx-10 mt-5 rounded-lg">
+      <div className="h-[70vh] overflow-y-auto border mx-10 mt-5 rounded-lg">
         <table className="min-w-full border-collapse border text-sm table-fixed">
           <thead className="bg-gray-200 sticky top-0 text-[white]">
             <tr>
