@@ -72,6 +72,8 @@ const ReturData = () => {
         const retur = await getReturData(date)
         setRetur(retur.data.data)
 
+        console.log(`INI RETUR MAS ARIS ${JSON.stringify(response.data.data)}`)
+
         const mappedFormData = formData.map(item => {
           const matchedRetur = retur.data.data.find(r => r.product_id === item.product_id);
           return matchedRetur ? {
@@ -161,8 +163,8 @@ const ReturData = () => {
                     <tr className='text-[12px]'>
                       <td className="text-left">{item.name}</td>
                       <td className="text-left">STOK</td>
-                      <td>{report?.stock}</td>
-                      <td>{report?.hasil_giling * item.kg} KG</td>
+                      <td>{reports.find(r => r.product_id === item.id)?.stock}</td>
+                      <td>{reports.find(r => r.product_id === item.id)?.hasil_giling * item.kg} KG</td>
                       <td>
                         <input
                           value={data.stock || ''}
@@ -179,10 +181,10 @@ const ReturData = () => {
                       </td>
                     </tr>
                     <tr className='text-[12px]'>
-                      <td>{report?.stock * item.kg}</td>
+                      <td>{reports.find(r => r.product_id === item.id)?.stock * item.kg}</td>
                       <td className="text-left">KELUAR</td>
-                      <td>{report?.keluar?.jual}{report?.keluar?.giling ? ` + ${report?.keluar.giling}` : ''}</td>
-                      <td>sak: {(report?.hasil_giling * item.kg) / item.kg}</td>
+                      <td>{reports.find(r => r.product_id === item.id)?.keluar?.jual}{reports.find(r => r.product_id === item.id)?.keluar?.giling ? ` + ${report?.keluar.giling}` : ''}</td>
+                      <td>sak: {(reports.find(r => r.product_id === item.id)?.hasil_giling * item.kg) / item.kg}</td>
                       <td>
                         <input
                           value={data.items_out || ''}
